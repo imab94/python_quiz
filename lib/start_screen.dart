@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
+import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/home_card.dart';
 import 'package:python_quiz/widgets/search_topic_bar.dart';
 import 'package:python_quiz/widgets/search_topic_results.dart';
@@ -55,6 +56,7 @@ class _StartScreenState extends State<StartScreen> {
   double completionPercentage = 0;
   String? lastTopicTitle;
   String? lastTopicLevel;
+  int completedQuizCount = 0;
 
   @override
   void initState() {
@@ -91,6 +93,15 @@ class _StartScreenState extends State<StartScreen> {
       });
     } catch (_) {
       // Topic not found.
+    }
+  }
+
+  Future<void> loadQuizProgress() async {
+    completedQuizCount =
+    await QuizProgressService.getCompletedQuizCount();
+
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -318,16 +329,26 @@ class _StartScreenState extends State<StartScreen> {
 
               HomeCard(
                 title: "Quiz Progress",
-                subtitle: "View quiz results & reports",
+                subtitle:
+                "$completedQuizCount / ${allTopics.length} Quizzes Completed",
+
+                progress: completedQuizCount / allTopics.length,
+
+                progressText:
+                "$completedQuizCount / ${allTopics.length} Quizzes Completed",
+
                 icon: Icons.analytics_rounded,
                 iconColor: Colors.lightGreenAccent,
-                onTap: () {
-                  Navigator.push(
+
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const QuizProgressScreen(),
                     ),
                   );
+
+                  loadQuizProgress();
                 },
               ),
               const SizedBox(height: 18),

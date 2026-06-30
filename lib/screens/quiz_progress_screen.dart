@@ -6,7 +6,7 @@ import 'package:python_quiz/screens/quiz_report_screen.dart';
 import 'package:python_quiz/screens/topic_quiz_screen.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
-
+import 'package:python_quiz/widgets/quiz_progress_header.dart';
 import '../widgets/quiz_progress_card.dart';
 
 class QuizProgressScreen extends StatefulWidget {
@@ -28,7 +28,6 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
   Future<void> loadQuizResults() async {
     quizResults =
     await QuizProgressService.getAllQuizResults();
-
     if (mounted) {
       setState(() {});
     }
@@ -36,6 +35,12 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final attemptedTopics = quizResults.length;
+
+    final passedTopics = quizResults.values
+        .where((result) => result["passed"] == true)
+        .length;
+    final totalTopics = allTopics.length;
     return Scaffold(
       body: AppBackground(
         child: SafeArea(
@@ -58,7 +63,11 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                   ),
                 ),
               ),
-
+              QuizProgressHeader(
+                totalTopics: totalTopics,
+                attemptedTopics: attemptedTopics,
+                passedTopics: passedTopics,
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: allTopics.length,

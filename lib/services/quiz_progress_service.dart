@@ -40,6 +40,11 @@ class QuizProgressService {
     );
   }
 
+  static Future<int> getCompletedQuizCount() async {
+    final quizResults = await getAllQuizResults();
+    return quizResults.length;
+  }
+
   /// Returns every quiz result
   static Future<Map<String, dynamic>> getAllQuizResults() async {
     final prefs = await SharedPreferences.getInstance();
