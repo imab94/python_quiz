@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:python_quiz/answer_button.dart';
-import 'package:python_quiz/data/python_challenge.dart';
+
+import '../models/quiz_question.dart';
+
 
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({
     super.key,
+    required this.questions,
     required this.onSelectAnswer,
     required this.onExitQuiz,
   });
 
   final void Function(String answer) onSelectAnswer;
   final VoidCallback onExitQuiz;
+  final List<QuizQuestion> questions;
 
   @override
   State<QuestionsScreen> createState() {
@@ -35,12 +39,19 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     });
 
     Future.delayed(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+
+      final isLastQuestion =
+          currentQuestionIndex == widget.questions.length - 1;
+
       widget.onSelectAnswer(answer);
-      if (currentQuestionIndex + 1 < questions.length) {
+
+      if (!isLastQuestion && mounted) {
         setState(() {
           currentQuestionIndex++;
           selectedAnswer = null;
-          displayedAnswers = questions[currentQuestionIndex].shuffledAnswers;
+          displayedAnswers =
+              widget.questions[currentQuestionIndex].shuffledAnswers;
         });
       }
     });
@@ -50,12 +61,12 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   void initState() {
     super.initState();
     currentQuestionIndex = 0;
-    displayedAnswers = questions[currentQuestionIndex].shuffledAnswers;
+    displayedAnswers = widget.questions[currentQuestionIndex].shuffledAnswers;
   }
 
   @override
   Widget build(context) {
-    final currentQuestion = questions[currentQuestionIndex];
+    final currentQuestion = widget.questions[currentQuestionIndex];
 
     return SizedBox(
       width: double.infinity,
@@ -106,7 +117,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Question ${currentQuestionIndex + 1}/${questions.length}',
+                    'Question ${currentQuestionIndex + 1}/${widget.questions.length}',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lato(
                       color: Colors.white70,

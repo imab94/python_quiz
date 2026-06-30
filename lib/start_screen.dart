@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:python_quiz/screens/learn_python_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
+import 'package:python_quiz/services/challenge_selection_screen.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/home_card.dart';
@@ -27,14 +29,8 @@ import 'package:python_quiz/widgets/stat_chip.dart';
 import 'package:python_quiz/screens/quiz_progress_screen.dart';
 
 class StartScreen extends StatefulWidget {
-  const StartScreen(
-      this.startQuiz,
-      this.learnPython, {
-        super.key,
-      });
+  const StartScreen({super.key});
 
-  final VoidCallback startQuiz;
-  final VoidCallback learnPython;
   static const popularTopics = [
     variablesTopic,
     functionsTopic,
@@ -63,6 +59,7 @@ class _StartScreenState extends State<StartScreen> {
     super.initState();
     loadProgress();
     loadLastTopic();
+    loadQuizProgress();
   }
 
   Future<void> loadProgress() async {
@@ -97,12 +94,13 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   Future<void> loadQuizProgress() async {
-    completedQuizCount =
-    await QuizProgressService.getCompletedQuizCount();
+    final results = await QuizProgressService.getAllQuizResults();
 
-    if (mounted) {
-      setState(() {});
-    }
+    if (!mounted) return;
+
+    setState(() {
+      completedQuizCount = results.length;
+    });
   }
 
   @override
@@ -277,15 +275,31 @@ class _StartScreenState extends State<StartScreen> {
                 progress: completionPercentage,
                 progressText:
                 "$completedCount / ${allTopics.length} Topics Completed (${(completionPercentage * 100).round()}%)",
-                onTap: widget.learnPython,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LearnPythonScreen(),
+                    ),
+                  );
+
+                  loadQuizProgress();
+                },
               ),
               const SizedBox(height: 18),
               HomeCard(
-                title: "Python Quiz",
+                title: "Python Challenge",
                 subtitle: "$totalQuizQuestions+ Questions\nTest Your Knowledge",
                 icon: Icons.quiz_rounded,
                 iconColor: Colors.lightBlueAccent,
-                onTap: widget.startQuiz,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ChallengeSelectionScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 18),
               Row(
@@ -326,20 +340,14 @@ class _StartScreenState extends State<StartScreen> {
                 ],
               ),
               const SizedBox(height: 18),
-
               HomeCard(
                 title: "Quiz Progress",
-                subtitle:
-                "$completedQuizCount / ${allTopics.length} Quizzes Completed",
-
+                subtitle: "Track your performance",
                 progress: completedQuizCount / allTopics.length,
-
                 progressText:
                 "$completedQuizCount / ${allTopics.length} Quizzes Completed",
-
                 icon: Icons.analytics_rounded,
                 iconColor: Colors.lightGreenAccent,
-
                 onTap: () async {
                   await Navigator.push(
                     context,
@@ -347,7 +355,6 @@ class _StartScreenState extends State<StartScreen> {
                       builder: (_) => const QuizProgressScreen(),
                     ),
                   );
-
                   loadQuizProgress();
                 },
               ),
