@@ -3,9 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:python_quiz/models/topic.dart';
 import 'package:python_quiz/screens/topic_quiz_screen.dart';
+import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 
-class TopicResultScreen extends StatelessWidget {
+class TopicResultScreen extends StatefulWidget {
   const TopicResultScreen({
     super.key,
     required this.topic,
@@ -15,11 +16,32 @@ class TopicResultScreen extends StatelessWidget {
   final Topic topic;
   final List<String> selectedAnswers;
 
+  @override
+  State<TopicResultScreen> createState() => _TopicResultScreenState();
+}
+
+class _TopicResultScreenState extends State<TopicResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _saveQuizResult();
+  }
+
+  Future<void> _saveQuizResult() async {
+    await QuizProgressService.saveQuizResult(
+      topicTitle: widget.topic.title,
+      score: correctAnswers,
+      totalQuestions: widget.topic.quizQuestions.length,
+      selectedAnswers: widget.selectedAnswers,
+    );
+  }
+
   int get correctAnswers {
     int score = 0;
 
-    for (int i = 0; i < topic.quizQuestions.length; i++) {
-      if (selectedAnswers[i] == topic.quizQuestions[i].answers.first) {
+    for (int i = 0; i < widget.topic.quizQuestions.length; i++) {
+      if (widget.selectedAnswers[i] ==
+          widget.topic.quizQuestions[i].answers.first) {
         score++;
       }
     }
@@ -29,7 +51,7 @@ class TopicResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = topic.quizQuestions.length;
+    final total = widget.topic.quizQuestions.length;
     final score = correctAnswers;
     final percentage = ((score / total) * 100).round();
 
@@ -65,7 +87,11 @@ class TopicResultScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 30),
 
-                Icon(trophyIcon, size: 90, color: color),
+                Icon(
+                  trophyIcon,
+                  size: 90,
+                  color: color,
+                ),
 
                 const SizedBox(height: 20),
 
@@ -81,8 +107,11 @@ class TopicResultScreen extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Text(
-                  topic.title,
-                  style: GoogleFonts.lato(color: Colors.white70, fontSize: 18),
+                  widget.topic.title,
+                  style: GoogleFonts.lato(
+                    color: Colors.white70,
+                    fontSize: 18,
+                  ),
                 ),
 
                 const SizedBox(height: 40),
@@ -93,7 +122,9 @@ class TopicResultScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: .08),
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white12),
+                    border: Border.all(
+                      color: Colors.white12,
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -149,7 +180,7 @@ class TopicResultScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => TopicQuizScreen(
-                            topic: topic,
+                            topic: widget.topic,
                           ),
                         ),
                       );
@@ -160,6 +191,7 @@ class TopicResultScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 15),
+
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -168,7 +200,7 @@ class TopicResultScreen extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white, // Text & icon color
+                      foregroundColor: Colors.white,
                       side: const BorderSide(
                         color: Colors.white24,
                       ),
@@ -180,6 +212,7 @@ class TopicResultScreen extends StatelessWidget {
                     label: const Text("Back To Lesson"),
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),
@@ -189,7 +222,11 @@ class TopicResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _stat(String title, String value, Color color) {
+  Widget _stat(
+      String title,
+      String value,
+      Color color,
+      ) {
     return Column(
       children: [
         Text(
@@ -200,7 +237,12 @@ class TopicResultScreen extends StatelessWidget {
             fontSize: 34,
           ),
         ),
-        Text(title, style: GoogleFonts.lato(color: Colors.white70)),
+        Text(
+          title,
+          style: GoogleFonts.lato(
+            color: Colors.white70,
+          ),
+        ),
       ],
     );
   }

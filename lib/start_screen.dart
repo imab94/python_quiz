@@ -23,6 +23,7 @@ import 'data/all_topics.dart';
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/continue_learning_card.dart';
 import 'package:python_quiz/widgets/stat_chip.dart';
+import 'package:python_quiz/screens/quiz_progress_screen.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen(
@@ -201,7 +202,6 @@ class _StartScreenState extends State<StartScreen> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 22),
               ],
               Text(
@@ -281,7 +281,7 @@ class _StartScreenState extends State<StartScreen> {
                 children: [
                   Expanded(
                     child: DashboardCard(
-                      title: "Favorites",
+                      title: "Favourites",
                       subtitle: "Saved Topics",
                       icon: Icons.favorite,
                       iconColor: Colors.redAccent,
@@ -313,6 +313,22 @@ class _StartScreenState extends State<StartScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 18),
+
+              HomeCard(
+                title: "Quiz Progress",
+                subtitle: "View quiz results & reports",
+                icon: Icons.analytics_rounded,
+                iconColor: Colors.lightGreenAccent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const QuizProgressScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 18),
               const WhyPythonCard(),
