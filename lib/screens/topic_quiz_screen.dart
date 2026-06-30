@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -5,17 +7,26 @@ import 'package:python_quiz/models/topic.dart';
 import 'package:python_quiz/models/quiz_question.dart';
 import 'package:python_quiz/screens/topic_result_screen.dart';
 import 'package:python_quiz/widgets/app_background.dart';
+import '../widgets/quiz_timer.dart';
+
 
 class TopicQuizScreen extends StatefulWidget {
-  const TopicQuizScreen({super.key, required this.topic});
-
+  const TopicQuizScreen({
+    super.key,
+    required this.topic,
+  });
   final Topic topic;
 
   @override
   State<TopicQuizScreen> createState() => _TopicQuizScreenState();
+
 }
 
 class _TopicQuizScreenState extends State<TopicQuizScreen> {
+  late Timer timer;
+
+  late int remainingSeconds;
+
   int currentQuestionIndex = 0;
 
   String? selectedAnswer;
@@ -26,10 +37,128 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
   QuizQuestion get currentQuestion =>
       widget.topic.quizQuestions[currentQuestionIndex];
 
+  Future<void> showTimeUpDialog() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: const Color(0xff24113d),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              const Icon(
+                Icons.timer_off,
+                color: Colors.redAccent,
+                size: 70,
+              ),
+
+              const SizedBox(height: 20),
+
+              Text(
+                "Time's Up!",
+                style: GoogleFonts.lato(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                "Your quiz is being submitted...",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
+                  color: Colors.white70,
+                  fontSize: 17,
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              const CircularProgressIndicator(
+                color: Colors.amber,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     shuffledAnswers = currentQuestion.shuffledAnswers;
+    remainingSeconds =
+        (widget.topic.quizQuestions.length * 0.3 * 60).ceil();
+
+    startTimer();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+          (timer) {
+        if (!mounted) return;
+
+        if (remainingSeconds > 0) {
+          setState(() {
+            remainingSeconds--;
+          });
+        } else {
+          timer.cancel();
+
+          // Show dialog
+          showTimeUpDialog();
+
+          // Submit after 2 seconds
+          Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
+
+            Navigator.of(context).pop(); // close dialog
+
+            finishQuiz();
+          });
+        }
+      },
+    );
+  }
+
+  void finishQuiz() {
+    timer.cancel();
+
+    // Save current selected answer (if any)
+    if (selectedAnswer != null &&
+        selectedAnswers.length == currentQuestionIndex) {
+      selectedAnswers.add(selectedAnswer!);
+    }
+
+    // Fill unanswered questions with empty answers
+    while (selectedAnswers.length < widget.topic.quizQuestions.length) {
+      selectedAnswers.add("");
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TopicResultScreen(
+          topic: widget.topic,
+          selectedAnswers: selectedAnswers,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   void nextQuestion() {
@@ -39,15 +168,7 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
 
     if (currentQuestionIndex ==
         widget.topic.quizQuestions.length - 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => TopicResultScreen(
-            topic: widget.topic,
-            selectedAnswers: selectedAnswers,
-          ),
-        ),
-      );
+       finishQuiz();
       return;
     }
 
@@ -56,6 +177,13 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
       selectedAnswer = null;
       shuffledAnswers = currentQuestion.shuffledAnswers;
     });
+  }
+
+  String formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remaining = seconds % 60;
+
+    return "${minutes.toString().padLeft(2, '0')}:${remaining.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -88,16 +216,49 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 48),
                   ],
                 ),
+                const SizedBox(height: 24),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
 
-                const SizedBox(height: 25),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
 
-                Text(
-                  "Question ${currentQuestionIndex + 1} / ${widget.topic.quizQuestions.length}",
-                  style: GoogleFonts.lato(color: Colors.white70, fontSize: 16),
+                          Text(
+                            "Question ${currentQuestionIndex + 1} / ${widget.topic.quizQuestions.length}",
+                            style: GoogleFonts.lato(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          Text(
+                            widget.topic.title,
+                            style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    QuizTimer(
+                      time: formatTime(remainingSeconds),
+                      isWarning: remainingSeconds <= 30,
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 20),
@@ -110,7 +271,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                   minHeight: 8,
                   borderRadius: BorderRadius.circular(20),
                 ),
-
                 const SizedBox(height: 40),
                 Text(
                   currentQuestion.text,
@@ -121,7 +281,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 35),
                 Expanded(
                   child: ListView.builder(
@@ -142,7 +301,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                             width: 2,
                           ),
                         ),
-
                         child: RadioListTile<String>(
                           value: answer,
                           groupValue: selectedAnswer,
@@ -154,7 +312,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                               fontSize: 17,
                             ),
                           ),
-
                           onChanged: (value) {
                             setState(() {
                               selectedAnswer = value;
@@ -170,7 +327,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                   height: 58,
                   child: ElevatedButton(
                     onPressed: selectedAnswer == null ? null : nextQuestion,
-
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurpleAccent,
 
@@ -178,7 +334,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
-
                     child: Text(
                       currentQuestionIndex ==
                               widget.topic.quizQuestions.length - 1
@@ -192,7 +347,6 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 15),
               ],
             ),

@@ -40,8 +40,11 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
     int score = 0;
 
     for (int i = 0; i < widget.topic.quizQuestions.length; i++) {
-      if (widget.selectedAnswers[i] ==
-          widget.topic.quizQuestions[i].answers.first) {
+      final userAnswer = i < widget.selectedAnswers.length
+          ? widget.selectedAnswers[i]
+          : "";
+
+      if (userAnswer == widget.topic.quizQuestions[i].answers.first) {
         score++;
       }
     }

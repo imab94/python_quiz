@@ -99,17 +99,19 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
                       ),
-                      child: QuizProgressCard(
+                      child:
+                      QuizProgressCard(
                         title: topic.title,
                         level: topic.level,
                         status: attempted
                             ? "$status • ${result["score"]}/${result["totalQuestions"]}"
                             : status,
                         statusColor: color,
-                        actionText: attempted
-                            ? "View Report"
-                            : "Start Quiz",
-                        onTap: () {
+
+                        // LEFT BUTTON
+                        primaryActionText: attempted ? "View Report" : "Start Quiz",
+
+                        onPrimaryTap: () {
                           if (attempted) {
                             Navigator.push(
                               context,
@@ -134,6 +136,27 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                             });
                           }
                         },
+                        // RIGHT BUTTON
+                        secondaryActionText: attempted
+                            ? (result["passed"]
+                            ? "Improve Score"
+                            : "Retry Quiz")
+                            : null,
+
+                        onSecondaryTap: attempted
+                            ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TopicQuizScreen(
+                                topic: topic,
+                              ),
+                            ),
+                          ).then((_) {
+                            loadQuizResults();
+                          });
+                        }
+                            : null,
                       ),
                     );
                   },

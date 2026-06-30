@@ -8,102 +8,116 @@ class QuizProgressCard extends StatelessWidget {
     required this.level,
     required this.status,
     required this.statusColor,
-    required this.actionText,
-    required this.onTap,
+
+    required this.primaryActionText,
+    required this.onPrimaryTap,
+
+    this.secondaryActionText,
+    this.onSecondaryTap,
   });
 
   final String title;
   final String level;
   final String status;
   final Color statusColor;
-  final String actionText;
-  final VoidCallback onTap;
+
+  final String primaryActionText;
+  final VoidCallback onPrimaryTap;
+
+  final String? secondaryActionText;
+  final VoidCallback? onSecondaryTap;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: .06),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: .08),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: .08)),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 19,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  level,
-                  style: GoogleFonts.lato(
-                    color: Colors.white60,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.circle,
-                      size: 11,
-                      color: statusColor,
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    Expanded(
-                      child: Text(
-                        status,
-                        style: GoogleFonts.lato(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Divider(
-                  color: Colors.white.withValues(alpha: .08),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      actionText,
-                      style: GoogleFonts.lato(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white70,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.lato(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 19,
             ),
           ),
-        ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            level,
+            style: GoogleFonts.lato(color: Colors.white60, fontSize: 14),
+          ),
+
+          const SizedBox(height: 16),
+
+          Row(
+            children: [
+              Icon(Icons.circle, size: 11, color: statusColor),
+
+              const SizedBox(width: 8),
+
+              Expanded(
+                child: Text(
+                  status,
+                  style: GoogleFonts.lato(
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          Divider(color: Colors.white.withValues(alpha: .08)),
+
+          const SizedBox(height: 16),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onPrimaryTap,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(primaryActionText),
+                ),
+              ),
+
+              if (secondaryActionText != null) ...[
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onSecondaryTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurpleAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(secondaryActionText!),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
   }
