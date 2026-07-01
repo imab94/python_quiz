@@ -103,6 +103,16 @@ class _StartScreenState extends State<StartScreen> {
     });
   }
 
+  Future<void> refreshDashboard() async {
+    await loadProgress();
+    await loadLastTopic();
+    await loadQuizProgress();
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final int totalTopics = allTopics.length;
@@ -274,7 +284,8 @@ class _StartScreenState extends State<StartScreen> {
                 iconColor: Colors.amber,
                 progress: completionPercentage,
                 progressText:
-                "$completedCount / ${allTopics.length} Topics Completed (${(completionPercentage * 100).round()}%)",
+                "$completedCount / ${allTopics.length} "
+                    "Topics Completed (${(completionPercentage * 100).round()}%)",
                 onTap: () async {
                   await Navigator.push(
                     context,
@@ -282,8 +293,7 @@ class _StartScreenState extends State<StartScreen> {
                       builder: (_) => const LearnPythonScreen(),
                     ),
                   );
-
-                  loadQuizProgress();
+                  await refreshDashboard();
                 },
               ),
               const SizedBox(height: 18),
@@ -292,13 +302,14 @@ class _StartScreenState extends State<StartScreen> {
                 subtitle: "$totalQuizQuestions+ Questions\nTest Your Knowledge",
                 icon: Icons.quiz_rounded,
                 iconColor: Colors.lightBlueAccent,
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const ChallengeSelectionScreen(),
                     ),
                   );
+                  await refreshDashboard();
                 },
               ),
               const SizedBox(height: 18),
@@ -327,13 +338,14 @@ class _StartScreenState extends State<StartScreen> {
                       subtitle: "Finished Topics",
                       icon: Icons.check_circle,
                       iconColor: Colors.greenAccent,
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => const CompletedScreen(),
                           ),
                         );
+                        await refreshDashboard();
                       },
                     ),
                   ),
@@ -355,7 +367,7 @@ class _StartScreenState extends State<StartScreen> {
                       builder: (_) => const QuizProgressScreen(),
                     ),
                   );
-                  loadQuizProgress();
+                  await refreshDashboard();
                 },
               ),
               const SizedBox(height: 18),
@@ -379,8 +391,8 @@ class _StartScreenState extends State<StartScreen> {
                     final topic = StartScreen.popularTopics[index];
                     return PopularTopicChip(
                       topic: topic,
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => TopicScreen(
@@ -390,6 +402,8 @@ class _StartScreenState extends State<StartScreen> {
                             ),
                           ),
                         );
+
+                        await refreshDashboard();
                       },
                     );
                   },
