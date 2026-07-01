@@ -1,9 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:python_quiz/answer_button.dart';
-
-import '../models/quiz_question.dart';
+import 'package:python_quiz/models/quiz_question.dart';
 
 
 class QuestionsScreen extends StatefulWidget {
@@ -12,10 +12,13 @@ class QuestionsScreen extends StatefulWidget {
     required this.questions,
     required this.onSelectAnswer,
     required this.onExitQuiz,
+    this.topWidget,
   });
 
   final void Function(String answer) onSelectAnswer;
   final VoidCallback onExitQuiz;
+  final Widget? topWidget;
+
   final List<QuizQuestion> questions;
 
   @override
@@ -60,9 +63,12 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   @override
   void initState() {
     super.initState();
+
     currentQuestionIndex = 0;
-    displayedAnswers = widget.questions[currentQuestionIndex].shuffledAnswers;
+    displayedAnswers =
+        widget.questions[currentQuestionIndex].shuffledAnswers;
   }
+
 
   @override
   Widget build(context) {
@@ -81,27 +87,105 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: Colors.white,
-                      title: const Text('Exit Quiz'),
-                      content: const Text(
-                        'Your progress will be lost. Continue?',
+                    barrierDismissible: false,
+                    builder: (context) => Dialog(
+                      backgroundColor: const Color(0xFF3A176E),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.amber,
+                              size: 60,
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            Text(
+                              "Exit Quiz?",
+                              style: GoogleFonts.lato(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            Text(
+                              "Your current quiz progress will be lost.\n\nAre you sure you want to exit?",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.lato(
+                                color: Colors.white70,
+                                fontSize: 17,
+                                height: 1.5,
+                              ),
+                            ),
+
+                            const SizedBox(height: 28),
+
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurpleAccent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  "Continue Quiz",
+                                  style: GoogleFonts.lato(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  widget.onExitQuiz();
+                                },
+                                child: Text(
+                                  "Exit Quiz",
+                                  style: GoogleFonts.lato(
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            widget.onExitQuiz();
-                          },
-                          child: const Text('Exit'),
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -116,17 +200,33 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Question ${currentQuestionIndex + 1}/${widget.questions.length}',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      color: Colors.white70,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Question ${currentQuestionIndex + 1}/${widget.questions.length}",
+                        style: GoogleFonts.lato(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+
+                      if (widget.topWidget != null)
+                        widget.topWidget!,
+                    ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+
+                  LinearProgressIndicator(
+                    value: (currentQuestionIndex + 1) / widget.questions.length,
+                    minHeight: 8,
+                    backgroundColor: Colors.white12,
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+
+                  const SizedBox(height: 28),
                   Text(
                     currentQuestion.text,
                     textAlign: TextAlign.center,

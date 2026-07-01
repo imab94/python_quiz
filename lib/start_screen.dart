@@ -27,6 +27,7 @@ import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/continue_learning_card.dart';
 import 'package:python_quiz/widgets/stat_chip.dart';
 import 'package:python_quiz/screens/quiz_progress_screen.dart';
+import 'package:python_quiz/services/challenge_progress_service.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -54,19 +55,22 @@ class _StartScreenState extends State<StartScreen> {
   String? lastTopicLevel;
   int completedQuizCount = 0;
 
+  int passedChallenges = 0;
+  int failedChallenges = 0;
+
   @override
   void initState() {
     super.initState();
     loadProgress();
     loadLastTopic();
     loadQuizProgress();
+    loadChallengeProgress();
   }
 
   Future<void> loadProgress() async {
     completedCount = await CompletedService.getCompletedCount();
     completionPercentage =
     await CompletedService.getCompletionPercentage(allTopics.length);
-
     if (mounted) {
       setState(() {});
     }
@@ -74,16 +78,12 @@ class _StartScreenState extends State<StartScreen> {
 
   Future<void> loadLastTopic() async {
     final title = await ContinueReadingService.getLastTopic();
-
     if (title == null) return;
-
     try {
       final topic = allTopics.firstWhere(
             (topic) => topic.title == title,
       );
-
       if (!mounted) return;
-
       setState(() {
         lastTopicTitle = topic.title;
         lastTopicLevel = topic.level;
@@ -95,19 +95,25 @@ class _StartScreenState extends State<StartScreen> {
 
   Future<void> loadQuizProgress() async {
     final results = await QuizProgressService.getAllQuizResults();
-
     if (!mounted) return;
-
     setState(() {
       completedQuizCount = results.length;
     });
+  }
+
+  Future<void> loadChallengeProgress() async {
+    passedChallenges =
+    await ChallengeProgressService.getPassedCount();
+    failedChallenges =
+    await ChallengeProgressService.getFailedCount();
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> refreshDashboard() async {
     await loadProgress();
     await loadLastTopic();
     await loadQuizProgress();
-
     if (mounted) {
       setState(() {});
     }
@@ -298,8 +304,10 @@ class _StartScreenState extends State<StartScreen> {
               ),
               const SizedBox(height: 18),
               HomeCard(
-                title: "Python Challenge",
-                subtitle: "$totalQuizQuestions+ Questions\nTest Your Knowledge",
+                title: "Random Challenge",
+                subtitle:
+                "$totalQuizQuestions+ Random Questions"
+                    "\n🏆 $passedChallenges Passed • $failedChallenges Failed",
                 icon: Icons.quiz_rounded,
                 iconColor: Colors.lightBlueAccent,
                 onTap: () async {
@@ -310,6 +318,8 @@ class _StartScreenState extends State<StartScreen> {
                     ),
                   );
                   await refreshDashboard();
+                  await loadQuizProgress();
+                  await loadChallengeProgress();
                 },
               ),
               const SizedBox(height: 18),

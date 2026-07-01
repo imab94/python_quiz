@@ -105,4 +105,63 @@ const designPatternsQuiz = [
       'Decorator',
     ],
   ),
+  QuizQuestion(
+    'Which category does the Observer Pattern belong to?',
+    [
+      'Behavioral',
+      'Creational',
+      'Structural',
+      'Functional',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which category does the Facade Pattern belong to?',
+    [
+      'Structural',
+      'Behavioral',
+      'Creational',
+      'Procedural',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which category does the Decorator Pattern belong to?',
+    [
+      'Structural',
+      'Behavioral',
+      'Creational',
+      'Functional',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which design pattern is useful when object creation is complex?',
+    [
+      'Factory',
+      'Observer',
+      'Facade',
+      'Decorator',
+    ],
+  ),
+
+  QuizQuestion(
+    'What is the primary benefit of the Facade Pattern?',
+    [
+      'It hides the complexity of a subsystem',
+      'It creates multiple threads',
+      'It improves internet speed',
+      'It replaces inheritance',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which design pattern helps add new functionality without modifying the original class?',
+    [
+      'Decorator',
+      'Prototype',
+      'Singleton',
+      'Factory',
+    ],
+  ),
 ];

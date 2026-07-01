@@ -125,4 +125,33 @@ const memoryManagementQuiz = [
       'Inheritance',
     ],
   ),
+  QuizQuestion(
+    'Which memory area stores objects created during program execution?',
+    [
+      'Heap memory',
+      'Stack memory',
+      'Cache memory',
+      'ROM',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which type of objects are automatically removed by Python\'s garbage collector?',
+    [
+      'Unreachable objects',
+      'Global variables',
+      'Built-in functions',
+      'Imported modules',
+    ],
+  ),
+
+  QuizQuestion(
+    'Why is automatic memory management beneficial?',
+    [
+      'It reduces the need for manual memory allocation and deallocation',
+      'It eliminates all runtime errors',
+      'It makes every program execute faster',
+      'It prevents syntax errors',
+    ],
+  ),
 ];

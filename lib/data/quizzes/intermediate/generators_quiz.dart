@@ -89,4 +89,47 @@ const generatorsQuiz = [
       'A dictionary',
     ],
   ),
+  QuizQuestion(
+    'What will this code print?\n\n'
+        'def gen():\n'
+        '    yield 10\n\n'
+        'g = gen()\n'
+        'print(next(g))',
+    [
+      '10',
+      '0',
+      'None',
+      'Error',
+    ],
+  ),
+
+  QuizQuestion(
+    'What happens when yield is executed inside a generator?',
+    [
+      'The function pauses and returns a value',
+      'The function terminates permanently',
+      'The program exits',
+      'The loop breaks',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which statement best describes a generator?',
+    [
+      'It produces values on demand',
+      'It stores all values in memory',
+      'It always returns a list',
+      'It executes only once',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which built-in function converts all values from a generator into a list?',
+    [
+      'list()',
+      'tuple()',
+      'iter()',
+      'next()',
+    ],
+  ),
 ];

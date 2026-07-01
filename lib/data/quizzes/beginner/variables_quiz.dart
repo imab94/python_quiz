@@ -71,4 +71,68 @@ const variablesQuiz = [
       'Error',
     ],
   ),
+  QuizQuestion(
+    'Which of the following is an invalid variable name?',
+    [
+      '2student',
+      'student_2',
+      '_student',
+      'studentName',
+    ],
+  ),
+
+  QuizQuestion(
+    'Are variable names in Python case-sensitive?',
+    [
+      'Yes',
+      'No',
+      'Only for strings',
+      'Only for numbers',
+    ],
+  ),
+
+  QuizQuestion(
+    'What will this code print?\n\n'
+        'x = y = 100\n'
+        'print(x, y)',
+    [
+      '100 100',
+      '100',
+      'Error',
+      '0 0',
+    ],
+  ),
+
+  QuizQuestion(
+    'What will be the values of x and y after this code?\n\n'
+        'x = 10\n'
+        'y = 20\n'
+        'x, y = y, x',
+    [
+      'x = 20, y = 10',
+      'x = 10, y = 20',
+      'x = 20, y = 20',
+      'Error',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which naming style is recommended for Python variables?',
+    [
+      'snake_case',
+      'camelCase',
+      'PascalCase',
+      'UPPERCASE',
+    ],
+  ),
+
+  QuizQuestion(
+    'Why should you use descriptive variable names?',
+    [
+      'They make code easier to read and maintain',
+      'They make programs execute faster',
+      'They reduce memory usage',
+      'They are required by Python',
+    ],
+  ),
 ];

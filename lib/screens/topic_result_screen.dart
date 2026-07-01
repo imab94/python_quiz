@@ -5,6 +5,7 @@ import 'package:python_quiz/models/topic.dart';
 import 'package:python_quiz/screens/topic_quiz_screen.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
+import 'package:python_quiz/screens/quiz_report_screen.dart';
 
 class TopicResultScreen extends StatefulWidget {
   const TopicResultScreen({
@@ -89,15 +90,12 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 30),
-
                 Icon(
                   trophyIcon,
                   size: 90,
                   color: color,
                 ),
-
                 const SizedBox(height: 20),
-
                 Text(
                   message,
                   style: GoogleFonts.lato(
@@ -106,9 +104,7 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
                     fontSize: 34,
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
                 Text(
                   widget.topic.title,
                   style: GoogleFonts.lato(
@@ -116,9 +112,7 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
                     fontSize: 18,
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(28),
@@ -173,6 +167,34 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
                 ),
 
                 const Spacer(),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurpleAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => QuizReportScreen(
+                            topic: widget.topic,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.analytics_outlined),
+                    label: const Text("Review Answers"),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
 
                 SizedBox(
                   width: double.infinity,

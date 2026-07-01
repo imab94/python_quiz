@@ -79,4 +79,48 @@ const decoratorsQuiz = [
       'They remove the need for functions',
     ],
   ),
+  QuizQuestion(
+    'Can multiple decorators be applied to a single function?',
+    [
+      'Yes',
+      'No',
+      'Only two decorators',
+      'Only built-in decorators',
+    ],
+  ),
+
+  QuizQuestion(
+    'When is a decorator executed?',
+    [
+      'When the decorated function is called',
+      'Only when the program exits',
+      'Only during import',
+      'Only inside a loop',
+    ],
+  ),
+
+  QuizQuestion(
+    'What will this code print?\n\n'
+        'class Demo:\n'
+        '    @staticmethod\n'
+        '    def greet():\n'
+        '        return "Hello"\n\n'
+        'print(Demo.greet())',
+    [
+      'Hello',
+      'greet',
+      'None',
+      'Error',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which of the following is a common use of decorators?',
+    [
+      'Logging and authentication',
+      'Creating variables',
+      'Declaring loops',
+      'Importing modules',
+    ],
+  ),
 ];

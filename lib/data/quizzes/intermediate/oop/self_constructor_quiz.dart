@@ -46,4 +46,58 @@ const selfAndConstructorQuiz = [
       'Handling exceptions',
     ],
   ),
+  QuizQuestion(
+    'What happens if __init__() is not defined in a class?',
+    [
+      'Python provides a default constructor',
+      'The class cannot be instantiated',
+      'A SyntaxError occurs',
+      'The class becomes abstract',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which statement creates an object of the Person class?',
+    [
+      'p = Person()',
+      'Person.create()',
+      'new Person()',
+      'object Person()',
+    ],
+  ),
+
+  QuizQuestion(
+    'What will this code print?\n\n'
+        'class Person:\n'
+        '    def __init__(self):\n'
+        '        self.name = "Arun"\n\n'
+        'p = Person()\n'
+        'print(p.name)',
+    [
+      'Arun',
+      'Person',
+      'name',
+      'Error',
+    ],
+  ),
+
+  QuizQuestion(
+    'Inside a class, how do you access an instance variable named age?',
+    [
+      'self.age',
+      'age.self',
+      'this.age',
+      'Person.age',
+    ],
+  ),
+
+  QuizQuestion(
+    'What is the purpose of the self parameter?',
+    [
+      'To access the object’s attributes and methods',
+      'To create a new class',
+      'To import modules',
+      'To define global variables',
+    ],
+  ),
 ];

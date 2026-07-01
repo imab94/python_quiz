@@ -24,13 +24,23 @@ class UniversalQuizResultScreen extends StatelessWidget {
     int score = 0;
 
     for (int i = 0; i < questions.length; i++) {
-      if (selectedAnswers[i] == questions[i].answers.first) {
+      final userAnswer =
+      i < selectedAnswers.length
+          ? selectedAnswers[i]
+          : "";
+
+      if (userAnswer == questions[i].answers.first) {
         score++;
       }
     }
 
     return score;
   }
+
+  bool get isPassed {
+    return correctAnswers >= (questions.length * 0.6).ceil();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +181,11 @@ class UniversalQuizResultScreen extends StatelessWidget {
                     const SizedBox(height: 18),
                     ...List.generate(questions.length, (index) {
                       final question = questions[index];
-
-                      final yourAnswer = selectedAnswers[index];
-
-                      final correct = yourAnswer == question.answers.first;
+                      final yourAnswer = index < selectedAnswers.length
+                          ? selectedAnswers[index]
+                          : "Not Answered";
+                      final correct =
+                          yourAnswer == question.answers.first;
 
                       return Card(
                         color: Colors.white10,
@@ -204,9 +215,15 @@ class UniversalQuizResultScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   Icon(
-                                    correct ? Icons.check_circle : Icons.cancel,
+                                    correct
+                                        ? Icons.check_circle
+                                        : yourAnswer == "Not Answered"
+                                        ? Icons.help_outline
+                                        : Icons.cancel,
                                     color: correct
                                         ? Colors.greenAccent
+                                        : yourAnswer == "Not Answered"
+                                        ? Colors.orangeAccent
                                         : Colors.redAccent,
                                   ),
 
@@ -216,7 +233,12 @@ class UniversalQuizResultScreen extends StatelessWidget {
                                     child: Text(
                                       yourAnswer,
                                       style: GoogleFonts.lato(
-                                        color: Colors.white70,
+                                        color: yourAnswer == "Not Answered"
+                                            ? Colors.orangeAccent
+                                            : Colors.white70,
+                                        fontWeight: yourAnswer == "Not Answered"
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ),

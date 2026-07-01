@@ -73,7 +73,7 @@ class _TopicScreenState extends State<TopicScreen> {
   }
 
   String estimateQuizTime(int questionCount) {
-    final minutes = (questionCount * 0.3).ceil();
+    final minutes = (questionCount * 0.1).ceil();
 
     return "$minutes Minute${minutes > 1 ? "s" : ""}";
   }

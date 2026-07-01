@@ -117,7 +117,9 @@ class _QuizReportScreenState extends State<QuizReportScreen> {
                           (index) => AnswerReviewCard(
                         questionNumber: index + 1,
                         question: widget.topic.quizQuestions[index],
-                        selectedAnswer: answers[index],
+                        selectedAnswer: index < answers.length
+                            ? answers[index]
+                            : "",
                       ),
                     ),
 

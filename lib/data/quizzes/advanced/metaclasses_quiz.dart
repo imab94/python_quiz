@@ -85,4 +85,56 @@ const metaclassesQuiz = [
       'For writing simple loops',
     ],
   ),
+  QuizQuestion(
+    'Which built-in metaclass is used by default for most Python classes?',
+    [
+      'type',
+      'object',
+      'ABC',
+      'Meta',
+    ],
+  ),
+
+  QuizQuestion(
+    'What will this code print?\n\n'
+        'class Person:\n'
+        '    pass\n\n'
+        'print(type(Person).__name__)',
+    [
+      'type',
+      'Person',
+      'object',
+      'Error',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which of the following can a metaclass modify?',
+    [
+      'Class attributes and methods during class creation',
+      'Only local variables',
+      'Only function parameters',
+      'Only loop variables',
+    ],
+  ),
+
+  QuizQuestion(
+    'Why are metaclasses rarely used in everyday Python programming?',
+    [
+      'Most applications do not require custom class creation',
+      'Python does not support them',
+      'They work only with abstract classes',
+      'They are slower than functions',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which statement about metaclasses is true?',
+    [
+      'They define how classes are constructed',
+      'They replace inheritance',
+      'They create threads automatically',
+      'They are used only for file handling',
+    ],
+  ),
 ];

@@ -95,4 +95,93 @@ const oopIntroductionQuiz = [
       'Composition',
     ],
   ),
+  QuizQuestion(
+    'Which OOP principle hides internal implementation details?',
+    [
+      'Abstraction',
+      'Inheritance',
+      'Polymorphism',
+      'Recursion',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which OOP principle bundles data and methods together?',
+    [
+      'Encapsulation',
+      'Abstraction',
+      'Inheritance',
+      'Iteration',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which OOP principle allows one interface to have multiple implementations?',
+    [
+      'Polymorphism',
+      'Encapsulation',
+      'Inheritance',
+      'Abstraction',
+    ],
+  ),
+
+  QuizQuestion(
+    'A blueprint used to create objects is called...',
+    [
+      'A class',
+      'A method',
+      'A variable',
+      'A module',
+    ],
+  ),
+
+  QuizQuestion(
+    'A real-world entity like a car or a student is typically represented as...',
+    [
+      'An object',
+      'A loop',
+      'A package',
+      'A keyword',
+    ],
+  ),
+
+  QuizQuestion(
+    'A class can contain...',
+    [
+      'Attributes and methods',
+      'Only variables',
+      'Only loops',
+      'Only comments',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which of the following is an advantage of OOP?',
+    [
+      'Better code organization and reusability',
+      'No need for functions',
+      'No debugging required',
+      'Programs always run faster',
+    ],
+  ),
+
+  QuizQuestion(
+    'Can multiple objects be created from the same class?',
+    [
+      'Yes',
+      'No',
+      'Only one object is allowed',
+      'Only if inheritance is used',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which of the following is an example of an object?',
+    [
+      'A specific Car created from the Car class',
+      'The class keyword',
+      'A Python module',
+      'A function definition',
+    ],
+  ),
 ];

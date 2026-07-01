@@ -200,9 +200,115 @@ class _TopicQuizScreenState extends State<TopicQuizScreen> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => Dialog(
+                            backgroundColor: const Color(0xFF3A176E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+
+                                  const Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.amber,
+                                    size: 60,
+                                  ),
+
+                                  const SizedBox(height: 18),
+
+                                  Text(
+                                    "Exit Quiz?",
+                                    style: GoogleFonts.lato(
+                                      color: Colors.white,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  Text(
+                                    "Your current quiz progress will be lost.\n\nAre you sure you want to exit?",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.lato(
+                                      color: Colors.white70,
+                                      fontSize: 17,
+                                      height: 1.5,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 28),
+
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.deepPurpleAccent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Continue Quiz",
+                                        style: GoogleFonts.lato(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 12),
+
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                          color: Colors.redAccent,
+                                          width: 1.5,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context); // Close dialog
+                                        timer.cancel();         // Stop timer
+                                        Navigator.pop(context); // Exit quiz
+                                      },
+                                      child: Text(
+                                        "Exit Quiz",
+                                        style: GoogleFonts.lato(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(
+                          Icons.close,
+                          color: Colors.white
+                      ),
                     ),
 
                     Expanded(

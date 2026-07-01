@@ -75,4 +75,43 @@ const multiprocessingQuiz = [
       'close()',
     ],
   ),
+  QuizQuestion(
+    'What is the main advantage of multiprocessing?',
+    [
+      'It can execute CPU-bound tasks in parallel',
+      'It shares all memory automatically',
+      'It replaces multithreading',
+      'It only works for file handling',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which method contains the code executed by a process?',
+    [
+      'run()',
+      'start()',
+      'join()',
+      'sleep()',
+    ],
+  ),
+
+  QuizQuestion(
+    'What does calling start() on a Process object do?',
+    [
+      'Starts a new process and invokes run()',
+      'Terminates the process',
+      'Waits for the process to finish',
+      'Deletes the process',
+    ],
+  ),
+
+  QuizQuestion(
+    'Which statement best describes multiprocessing?',
+    [
+      'Each process runs independently with its own memory space',
+      'All processes share the same memory by default',
+      'Processes cannot run simultaneously',
+      'Multiprocessing is only useful for I/O-bound tasks',
+    ],
+  ),
 ];
