@@ -6,7 +6,6 @@ import 'package:python_quiz/screens/universal_quiz_result_screen.dart';
 import 'package:python_quiz/services/challenge_question_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/widgets/quiz_timer.dart';
-import 'package:python_quiz/services/challenge_progress_service.dart';
 
 class ChallengeQuizScreen extends StatefulWidget {
   const ChallengeQuizScreen({
@@ -90,23 +89,6 @@ class _ChallengeQuizScreenState
     isSubmitting = true;
 
     timer?.cancel();
-
-    // Calculate score safely
-    int score = 0;
-
-    for (int i = 0; i < selectedAnswers.length; i++) {
-      if (selectedAnswers[i] == questions[i].answers.first) {
-        score++;
-      }
-    }
-
-    // Check if challenge is passed
-    final passed = score >= (questions.length * 0.6).ceil();
-
-    // Save result
-    await ChallengeProgressService.saveChallengeResult(
-      passed: passed,
-    );
 
     if (!mounted) return;
 

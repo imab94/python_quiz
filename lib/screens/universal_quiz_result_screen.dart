@@ -6,7 +6,11 @@ import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/services/challenge_question_service.dart';
 import 'package:python_quiz/screens/challenge_quiz_screen.dart';
 
-class UniversalQuizResultScreen extends StatelessWidget {
+import 'package:python_quiz/services/challenge_progress_service.dart';
+import 'package:python_quiz/services/achievement_manager.dart';
+import 'package:python_quiz/services/streak_service.dart';
+
+class UniversalQuizResultScreen extends StatefulWidget {
   const UniversalQuizResultScreen({
     super.key,
     required this.title,
@@ -18,18 +22,69 @@ class UniversalQuizResultScreen extends StatelessWidget {
   final String title;
   final List<QuizQuestion> questions;
   final List<String> selectedAnswers;
-  final ChallengeLevel challengeLevel;
+  final ChallengeLevel? challengeLevel;
+
+  @override
+  State<UniversalQuizResultScreen> createState() =>
+      _UniversalQuizResultScreenState();
+}
+
+class _UniversalQuizResultScreenState extends State<UniversalQuizResultScreen> {
+  bool _resultSaved = false;
+  bool _achievementProcessed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _saveChallengeResult();
+  }
+
+  Future<void> _saveChallengeResult() async {
+    if (_resultSaved) return;
+
+    _resultSaved = true;
+
+    // Save Challenge Progress
+    await ChallengeProgressService.saveChallengeResult(
+      passed: isPassed,
+      difficulty: widget.challengeLevel!.name,
+    );
+
+    // Update Daily Streak
+    await StreakService.updateStreak();
+
+    await AchievementManager.onStreakUpdated(
+      context: context,
+    );
+
+    // Check & Show Achievements
+    await _processAchievements();
+  }
+
+  Future<void> _processAchievements() async {
+    if (_achievementProcessed) return;
+
+    _achievementProcessed = true;
+
+    if (widget.challengeLevel != null) {
+      await AchievementManager.onRandomChallengeCompleted(
+        context: context,
+        score: correctAnswers,
+        totalQuestions: widget.questions.length,
+        difficulty: widget.challengeLevel!.name,
+      );
+    }
+  }
 
   int get correctAnswers {
     int score = 0;
 
-    for (int i = 0; i < questions.length; i++) {
-      final userAnswer =
-      i < selectedAnswers.length
-          ? selectedAnswers[i]
+    for (int i = 0; i < widget.questions.length; i++) {
+      final userAnswer = i < widget.selectedAnswers.length
+          ? widget.selectedAnswers[i]
           : "";
 
-      if (userAnswer == questions[i].answers.first) {
+      if (userAnswer == widget.questions[i].answers.first) {
         score++;
       }
     }
@@ -38,13 +93,37 @@ class UniversalQuizResultScreen extends StatelessWidget {
   }
 
   bool get isPassed {
-    return correctAnswers >= (questions.length * 0.6).ceil();
+    return correctAnswers >= (widget.questions.length * 0.6).ceil();
   }
 
+  Widget _statCard(String title, String value, Color color) {
+    return Container(
+      width: 120,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .05),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: GoogleFonts.lato(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(title, style: GoogleFonts.lato(color: Colors.white70)),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final total = questions.length;
+    final total = widget.questions.length;
     final score = correctAnswers;
     final wrong = total - score;
     final percentage = ((score / total) * 100).round();
@@ -85,7 +164,7 @@ class UniversalQuizResultScreen extends StatelessWidget {
                   },
                 ),
                 title: Text(
-                  title,
+                  widget.title,
                   style: GoogleFonts.lato(
                     color: Colors.white,
                     fontSize: 24,
@@ -179,13 +258,15 @@ class UniversalQuizResultScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 18),
-                    ...List.generate(questions.length, (index) {
-                      final question = questions[index];
-                      final yourAnswer = index < selectedAnswers.length
-                          ? selectedAnswers[index]
+
+                    ...List.generate(widget.questions.length, (index) {
+                      final question = widget.questions[index];
+
+                      final yourAnswer = index < widget.selectedAnswers.length
+                          ? widget.selectedAnswers[index]
                           : "Not Answered";
-                      final correct =
-                          yourAnswer == question.answers.first;
+
+                      final correct = yourAnswer == question.answers.first;
 
                       return Card(
                         color: Colors.white10,
@@ -259,8 +340,9 @@ class UniversalQuizResultScreen extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  ChallengeQuizScreen(level: challengeLevel),
+                              builder: (_) => ChallengeQuizScreen(
+                                level: widget.challengeLevel!,
+                              ),
                             ),
                           );
                         },
@@ -296,31 +378,6 @@ class UniversalQuizResultScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _statCard(String title, String value, Color color) {
-    return Container(
-      width: 120,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .05),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: GoogleFonts.lato(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(title, style: GoogleFonts.lato(color: Colors.white70)),
-        ],
       ),
     );
   }

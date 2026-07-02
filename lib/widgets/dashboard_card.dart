@@ -17,58 +17,54 @@ class DashboardCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(18),
       onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
       child: Container(
-        height: 120,
-
+        width: double.infinity,
+        height: 130,
         padding: const EdgeInsets.all(14),
-
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: .07),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white24),
         ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: iconColor,
+              size: 26,
+            ),
 
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(18),
+            const SizedBox(height: 10),
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 26,
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
               ),
+            ),
 
-              const SizedBox(height: 10),
+            const SizedBox(height: 4),
 
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white60,
               ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white60,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

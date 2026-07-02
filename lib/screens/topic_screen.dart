@@ -3,20 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:python_quiz/models/topic.dart';
 import 'package:python_quiz/models/topic_section.dart';
-
 import 'package:python_quiz/screens/topic_quiz_screen.dart';
-
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/widgets/code_block.dart';
 import 'package:python_quiz/widgets/topic_quiz_card.dart';
 import 'package:python_quiz/widgets/lesson_navigation_card.dart';
-
 import 'package:python_quiz/services/favourites_service.dart';
 import 'package:python_quiz/widgets/favourite_button.dart';
-
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/completed_button.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
+import 'package:python_quiz/services/achievement_service.dart';
+import 'package:python_quiz/widgets/achievement_popup.dart';
+import 'package:python_quiz/data/achievements.dart';
+import 'package:python_quiz/services/xp_service.dart';
 
 class TopicScreen extends StatefulWidget {
   const TopicScreen({
@@ -198,6 +198,22 @@ class _TopicScreenState extends State<TopicScreen> {
                   isCompleted: isCompleted,
                   onPressed: () async {
                     await CompletedService.markCompleted(widget.topic.title);
+                    await XPService.addXP(10);
+                    final unlocked =
+                    await AchievementService.unlockAchievement(
+                      "first_topic",
+                    );
+
+                    if (mounted && unlocked) {
+                      final achievement = allAchievements.firstWhere(
+                            (a) => a.id == "first_topic",
+                      );
+
+                      await showAchievementPopup(
+                        context: context,
+                        achievement: achievement,
+                      );
+                    }
 
                     if (!mounted) return;
 

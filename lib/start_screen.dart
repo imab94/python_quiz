@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/screens/learn_python_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
+import 'package:python_quiz/services/achievement_service.dart';
 import 'package:python_quiz/services/challenge_selection_screen.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
+import 'package:python_quiz/widgets/achievement_dashboard_card.dart';
 import 'package:python_quiz/widgets/home_card.dart';
 import 'package:python_quiz/widgets/search_topic_bar.dart';
 import 'package:python_quiz/widgets/search_topic_results.dart';
@@ -22,12 +24,16 @@ import 'package:python_quiz/data/intermediate/01_exception_handling.dart';
 import 'package:python_quiz/screens/favorites_screen.dart';
 import 'package:python_quiz/screens/completed_screen.dart';
 import 'package:python_quiz/widgets/dashboard_card.dart';
+import 'data/achievements.dart';
 import 'data/all_topics.dart';
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/continue_learning_card.dart';
 import 'package:python_quiz/widgets/stat_chip.dart';
 import 'package:python_quiz/screens/quiz_progress_screen.dart';
 import 'package:python_quiz/services/challenge_progress_service.dart';
+import 'package:python_quiz/services/streak_service.dart';
+import 'package:python_quiz/screens/achievement_screen.dart';
+
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -58,6 +64,11 @@ class _StartScreenState extends State<StartScreen> {
   int passedChallenges = 0;
   int failedChallenges = 0;
 
+  int currentStreak = 0;
+  int bestStreak = 0;
+
+  int unlockedAchievements = 0;
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +76,8 @@ class _StartScreenState extends State<StartScreen> {
     loadLastTopic();
     loadQuizProgress();
     loadChallengeProgress();
+    loadStreak();
+    loadAchievements();
   }
 
   Future<void> loadProgress() async {
@@ -74,6 +87,15 @@ class _StartScreenState extends State<StartScreen> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  Future<void> loadAchievements() async {
+    unlockedAchievements =
+    await AchievementService.getUnlockedCount();
+
+    if (!mounted) return;
+
+    setState(() {});
   }
 
   Future<void> loadLastTopic() async {
@@ -110,10 +132,21 @@ class _StartScreenState extends State<StartScreen> {
     setState(() {});
   }
 
+  Future<void> loadStreak() async {
+    currentStreak = await StreakService.getCurrentStreak();
+    bestStreak = await StreakService.getBestStreak();
+
+    if (!mounted) return;
+
+    setState(() {});
+  }
+
   Future<void> refreshDashboard() async {
     await loadProgress();
     await loadLastTopic();
     await loadQuizProgress();
+    await loadStreak();
+    await loadAchievements();
     if (mounted) {
       setState(() {});
     }
@@ -126,9 +159,13 @@ class _StartScreenState extends State<StartScreen> {
           (sum, topic) => sum + topic.quizQuestions.length,
     );
     return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 22,
+          vertical: 24,
+        ),
+        child: SizedBox(
+          width: double.infinity,
           child: Column(
             children: [
               /// Badge
@@ -228,6 +265,54 @@ class _StartScreenState extends State<StartScreen> {
                   },
                 ),
                 const SizedBox(height: 22),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: .12),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: Colors.orangeAccent.withValues(alpha: .4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.local_fire_department,
+                        color: Colors.orangeAccent,
+                        size: 42,
+                      ),
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              "$currentStreak Day Streak",
+                              style: GoogleFonts.lato(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+                              "Best Streak: $bestStreak Days",
+                              style: GoogleFonts.lato(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
               Text(
                 "Learn Python",
@@ -362,6 +447,22 @@ class _StartScreenState extends State<StartScreen> {
                 ],
               ),
               const SizedBox(height: 18),
+
+              AchievementDashboardCard(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AchievementScreen(),
+                    ),
+                  );
+
+                  await refreshDashboard();
+                },
+              ),
+
+              const SizedBox(height: 18),
+
               HomeCard(
                 title: "Quiz Progress",
                 subtitle: "Track your performance",
@@ -377,6 +478,7 @@ class _StartScreenState extends State<StartScreen> {
                       builder: (_) => const QuizProgressScreen(),
                     ),
                   );
+
                   await refreshDashboard();
                 },
               ),

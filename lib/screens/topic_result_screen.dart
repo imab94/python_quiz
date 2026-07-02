@@ -6,6 +6,11 @@ import 'package:python_quiz/screens/topic_quiz_screen.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/screens/quiz_report_screen.dart';
+import 'package:python_quiz/services/streak_service.dart';
+import 'package:python_quiz/services/achievement_service.dart';
+import 'package:python_quiz/widgets/achievement_popup.dart';
+import 'package:python_quiz/data/achievements.dart';
+import 'package:python_quiz/services/achievement_manager.dart';
 
 class TopicResultScreen extends StatefulWidget {
   const TopicResultScreen({
@@ -22,10 +27,33 @@ class TopicResultScreen extends StatefulWidget {
 }
 
 class _TopicResultScreenState extends State<TopicResultScreen> {
+  final List<String> unlockedAchievements = [];
+
   @override
   void initState() {
     super.initState();
-    _saveQuizResult();
+    _initializeResult();
+  }
+
+  Future<void> _initializeResult() async {
+    await _saveQuizResult();
+
+    if (!mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      for (final id in unlockedAchievements) {
+
+        final achievement =
+        allAchievements.firstWhere(
+              (a) => a.id == id,
+        );
+
+        await showAchievementPopup(
+          context: context,
+          achievement: achievement,
+        );
+      }
+    });
   }
 
   Future<void> _saveQuizResult() async {
@@ -34,6 +62,12 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
       score: correctAnswers,
       totalQuestions: widget.topic.quizQuestions.length,
       selectedAnswers: widget.selectedAnswers,
+    );
+
+    await AchievementManager.onTopicQuizCompleted(
+      context: context,
+      score: correctAnswers,
+      totalQuestions: widget.topic.quizQuestions.length,
     );
   }
 
