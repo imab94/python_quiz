@@ -5,6 +5,7 @@ import 'package:python_quiz/services/achievement_service.dart';
 import 'package:python_quiz/widgets/achievement_card.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/services/xp_service.dart';
+import 'package:python_quiz/widgets/xp_breakdown_dialog.dart';
 
 class AchievementScreen extends StatefulWidget {
   const AchievementScreen({super.key});
@@ -24,8 +25,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
   }
 
   Future<void> loadAchievements() async {
-    unlockedAchievements =
-    await AchievementService.getUnlockedAchievements();
+    unlockedAchievements = await AchievementService.getUnlockedAchievements();
 
     totalXP = await XPService.getTotalXP();
 
@@ -139,49 +139,60 @@ class _AchievementScreenState extends State<AchievementScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: .05),
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => const XPBreakdownDialog(),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: .05,
                                       ),
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
 
-                                      const SizedBox(height: 8),
+                                        const SizedBox(height: 8),
 
-                                      // Fixed height title
-                                      SizedBox(
-                                        height: 42,
-                                        child: Center(
-                                          child: Text(
-                                            "$totalXP XP",
-                                            textAlign: TextAlign.center,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.lato(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 22,
+                                        // Fixed height title
+                                        SizedBox(
+                                          height: 42,
+                                          child: Center(
+                                            child: Text(
+                                              "$totalXP XP",
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.lato(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 22,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
 
-                                      const SizedBox(height: 4),
+                                        const SizedBox(height: 4),
 
-                                      Text(
-                                        "Total XP",
-                                        style: GoogleFonts.lato(
-                                          color: Colors.white60,
+                                        Text(
+                                          "Total XP",
+                                          style: GoogleFonts.lato(
+                                            color: Colors.white60,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

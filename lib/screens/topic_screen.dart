@@ -150,7 +150,7 @@ class _TopicScreenState extends State<TopicScreen> {
                   widget.topic.title,
                   style: GoogleFonts.lato(
                     color: Colors.white,
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -198,7 +198,7 @@ class _TopicScreenState extends State<TopicScreen> {
                   isCompleted: isCompleted,
                   onPressed: () async {
                     await CompletedService.markCompleted(widget.topic.title);
-                    await XPService.addXP(10);
+                    await XPService.addActivityXP(10);
                     final unlocked =
                     await AchievementService.unlockAchievement(
                       "first_topic",

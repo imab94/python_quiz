@@ -60,6 +60,24 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     });
   }
 
+  double getQuestionFontSize(String question) {
+    final length = question.length;
+
+    if (length > 220) {
+      return 17;
+    }
+
+    if (length > 170) {
+      return 19;
+    }
+
+    if (length > 120) {
+      return 21;
+    }
+
+    return 24;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -128,7 +146,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               ),
                             ),
 
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 12),
 
                             SizedBox(
                               width: double.infinity,
@@ -154,7 +172,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               ),
                             ),
 
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 28),
 
                             SizedBox(
                               width: double.infinity,
@@ -195,9 +213,14 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             /// Quiz content
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              margin: const EdgeInsets.all(40),
+              margin: const EdgeInsets.fromLTRB(
+                24,
+                50,
+                24,
+                20,
+              ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
@@ -216,7 +239,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   LinearProgressIndicator(
                     value: (currentQuestionIndex + 1) / widget.questions.length,
@@ -226,25 +249,31 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 25),
                   Text(
                     currentQuestion.text,
                     textAlign: TextAlign.center,
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.lato(
                       color: const Color.fromARGB(255, 201, 153, 251),
-                      fontSize: 24,
+                      fontSize: getQuestionFontSize(currentQuestion.text),
                       fontWeight: FontWeight.bold,
+                      height: 1.3,
                     ),
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   ...displayedAnswers.map(
-                    (answer) => AnswerButton(
-                      answerText: answer,
-                      selected: selectedAnswer == answer,
-                      onTap: () {
-                        answerQuestion(answer);
-                      },
+                        (answer) => Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      child: AnswerButton(
+                        answerText: answer,
+                        selected: selectedAnswer == answer,
+                        onTap: () {
+                          answerQuestion(answer);
+                        },
+                      ),
                     ),
                   ),
                 ],

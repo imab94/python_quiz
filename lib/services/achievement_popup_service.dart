@@ -13,7 +13,7 @@ class AchievementPopupService {
     );
 
     // Award XP automatically
-    await XPService.addXP(achievement.xp);
+    await XPService.addAchievementXP(achievement.xp);
 
     await showAchievementPopup(
       context: context,

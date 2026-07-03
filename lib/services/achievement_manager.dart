@@ -23,20 +23,19 @@ class AchievementManager {
     // =========================
 
     // Quiz Completed
-    await XPService.addXP(10);
+    await XPService.addActivityXP(10);
 
     // Quiz Passed
     final passed = score >= (totalQuestions * 0.6).ceil();
 
     if (passed) {
-      await XPService.addXP(10);
+      await XPService.addActivityXP(10);
     }
 
     // Perfect Quiz Bonus XP
     if (score == totalQuestions) {
-      await XPService.addXP(20);
+      await XPService.addActivityXP(10);
     }
-
     // =========================
     // Questions Answered
     // =========================
@@ -144,18 +143,18 @@ class AchievementManager {
     // =========================
 
     // Challenge Completed
-    await XPService.addXP(20);
+    await XPService.addActivityXP(15);
 
     final passed = score >= (totalQuestions * 0.6).ceil();
 
     // Challenge Passed
     if (passed) {
-      await XPService.addXP(20);
+      await XPService.addActivityXP(15);
     }
 
     // Perfect Challenge Bonus
     if (score == totalQuestions) {
-      await XPService.addXP(20);
+      await XPService.addActivityXP(10);
     }
 
     // =========================
