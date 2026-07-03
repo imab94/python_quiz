@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const abstractionTopic = Topic(
   title: "Abstraction",
   level: "Intermediate",
+  priority: 18,
+  isRecommended: true,
+  recommendationReason: "Hide complexity behind simple, clean interfaces.",
   sections: [
     TopicSection(
       title: "What is Abstraction?",

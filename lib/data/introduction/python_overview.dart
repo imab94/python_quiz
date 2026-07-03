@@ -5,6 +5,9 @@ import '../quizzes/introduction/python_overview_quiz.dart';
 const pythonOverviewTopic = Topic(
   title: "Python Overview",
   level: "Introduction",
+  priority: 2,
+  isRecommended: false,
+  recommendationReason: "",
   sections: [
     TopicSection(
       title: "What is Python?",

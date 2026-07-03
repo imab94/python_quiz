@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const generatorsTopic = Topic(
   title: "Generators",
   level: "Intermediate",
+  priority: 10,
+  isRecommended: true,
+  recommendationReason: "Write memory-efficient Python programs.",
   sections: [
     TopicSection(
       title: "What are Generators?",

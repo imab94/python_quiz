@@ -5,6 +5,9 @@ import '../../quizzes/intermediate/oop/summary_oop_quiz.dart';
 const oopSummaryTopic = Topic(
   title: "OOP Revision & Summary",
   level: "Intermediate",
+  priority: 22,
+  isRecommended: true,
+  recommendationReason: "Strengthen your overall object-oriented skills.",
   sections: [
     TopicSection(
       title: "Complete OOP Revision",

@@ -6,6 +6,9 @@ import '../quizzes/introduction/installation_quiz.dart';
 const installationGuideTopic = Topic(
   title: "Python Installation Guide",
   level: "Introduction",
+  priority: 1,
+  isRecommended: false,
+  recommendationReason: "",
   sections: [
     TopicSection(
       title: "Introduction",

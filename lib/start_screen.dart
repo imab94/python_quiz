@@ -24,7 +24,6 @@ import 'package:python_quiz/data/intermediate/01_exception_handling.dart';
 import 'package:python_quiz/screens/favorites_screen.dart';
 import 'package:python_quiz/screens/completed_screen.dart';
 import 'package:python_quiz/widgets/dashboard_card.dart';
-import 'data/achievements.dart';
 import 'data/all_topics.dart';
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/continue_learning_card.dart';
@@ -33,6 +32,10 @@ import 'package:python_quiz/screens/quiz_progress_screen.dart';
 import 'package:python_quiz/services/challenge_progress_service.dart';
 import 'package:python_quiz/services/streak_service.dart';
 import 'package:python_quiz/screens/achievement_screen.dart';
+
+import 'package:python_quiz/models/topic.dart';
+import 'package:python_quiz/services/recommendation_service.dart';
+import 'package:python_quiz/widgets/recommended_topic_card.dart';
 
 
 class StartScreen extends StatefulWidget {
@@ -69,6 +72,8 @@ class _StartScreenState extends State<StartScreen> {
 
   int unlockedAchievements = 0;
 
+  Topic? recommendedTopic;
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +83,7 @@ class _StartScreenState extends State<StartScreen> {
     loadChallengeProgress();
     loadStreak();
     loadAchievements();
+    refreshDashboard();
   }
 
   Future<void> loadProgress() async {
@@ -142,11 +148,15 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   Future<void> refreshDashboard() async {
-    await loadProgress();
-    await loadLastTopic();
-    await loadQuizProgress();
-    await loadStreak();
-    await loadAchievements();
+      loadProgress();
+      loadLastTopic();
+      loadQuizProgress();
+      loadChallengeProgress();
+      loadStreak();
+      loadAchievements();
+    recommendedTopic =
+    await RecommendationService.getRecommendedTopic();
+
     if (mounted) {
       setState(() {});
     }
@@ -314,6 +324,14 @@ class _StartScreenState extends State<StartScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
+
+              if (recommendedTopic != null) ...[
+                RecommendedTopicCard(
+                  topic: recommendedTopic!,
+                ),
+                const SizedBox(height: 24),
+              ],
+
               Text(
                 "Learn Python",
                 style: GoogleFonts.lato(

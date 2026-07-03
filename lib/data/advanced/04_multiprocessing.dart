@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const multiprocessingTopic = Topic(
   title: "Multiprocessing",
   level: "Advanced",
+  priority: 26,
+  isRecommended: true,
+  recommendationReason: "Leverage multiple CPU cores for faster execution.",
   sections: [
     TopicSection(
       title: "What is Multiprocessing?",

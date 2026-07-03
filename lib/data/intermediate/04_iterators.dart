@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const iteratorsTopic = Topic(
   title: "Iterators",
   level: "Advanced",
+  priority: 9,
+  isRecommended: true,
+  recommendationReason: "Master efficient looping and iteration patterns.",
   sections: [
     TopicSection(
       title: "What are Iterators?",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const encapsulationTopic = Topic(
   title: "Encapsulation",
   level: "Intermediate",
+  priority: 17,
+  isRecommended: true,
+  recommendationReason: "Protect data through controlled object access.",
   sections: [
     TopicSection(
       title: "What is Encapsulation?",

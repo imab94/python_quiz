@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const exceptionHandlingTopic = Topic(
   title: "Exception Handling",
   level: "Intermediate",
+  priority: 8,
+  isRecommended: true,
+  recommendationReason: "Write cleaner and safer error handling code.",
   sections: [
     TopicSection(
       title: "Introduction to Exception Handling",

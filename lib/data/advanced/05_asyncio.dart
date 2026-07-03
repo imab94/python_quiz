@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const asyncioTopic = Topic(
   title: "Asyncio",
   level: "Advanced",
+  priority: 27,
+  isRecommended: true,
+  recommendationReason: "Handle I/O operations without blocking your application.",
   sections: [
     TopicSection(
       title: "What is Asyncio?",

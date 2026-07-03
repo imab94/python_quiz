@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const loggingTopic = Topic(
   title: "Logging",
   level: "Advanced",
+  priority: 24,
+  isRecommended: true,
+  recommendationReason: "Track application behavior and debug issues faster.",
   sections: [
     TopicSection(
       title: "What is Logging?",

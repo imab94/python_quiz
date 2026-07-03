@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const functionsTopic = Topic(
   title: "Functions",
   level: "Beginner",
+  priority: 6,
+  isRecommended: true,
+  recommendationReason: "Build reusable and organized Python code.",
   sections: [
     TopicSection(
       title: "Introduction to Functions",

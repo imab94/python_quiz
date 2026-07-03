@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const classesAndObjectsTopic = Topic(
   title: "Classes and Objects",
   level: "Intermediate",
+  priority: 13,
+  isRecommended: true,
+  recommendationReason: "Create reusable objects from well-designed classes.",
   sections: [
     TopicSection(
       title: "What is a Class?",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const dunderMethodsTopic = Topic(
   title: "Dunder (Magic) Methods",
   level: "Intermediate",
+  priority: 21,
+  isRecommended: true,
+  recommendationReason: "Customize object behavior with magic methods.",
   sections: [
     TopicSection(
       title: "What are Dunder Methods?",

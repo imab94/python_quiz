@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const metaclassesTopic = Topic(
   title: "Metaclasses",
   level: "Advanced",
+  priority: 31,
+  isRecommended: true,
+  recommendationReason: "Control class creation and unlock advanced Python features.",
   sections: [
     TopicSection(
       title: "What are Metaclasses?",

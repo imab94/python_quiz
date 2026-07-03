@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const testingTopic = Topic(
   title: "Testing",
   level: "Advanced",
+  priority: 29,
+  isRecommended: true,
+  recommendationReason: "Write reliable code by catching bugs before deployment.",
   sections: [
     TopicSection(
       title: "What is Testing?",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const memoryManagementTopic = Topic(
   title: "Memory Management & Garbage Collection",
   level: "Advanced",
+  priority: 28,
+  isRecommended: true,
+  recommendationReason: "Optimize memory usage and build efficient applications.",
   sections: [
     TopicSection(
       title: "What is Memory Management?",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const oopIntroductionTopic = Topic(
   title: "OOP Introduction",
   level: "Intermediate",
+  priority: 12,
+  isRecommended: true,
+  recommendationReason: "Build a strong foundation in object-oriented design.",
   sections: [
     TopicSection(
       title: "What is Object-Oriented Programming?",

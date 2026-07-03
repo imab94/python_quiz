@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const variablesInOOPTopic = Topic(
   title: "Instance and Class Variables",
   level: "Intermediate",
+  priority: 15,
+  isRecommended: true,
+  recommendationReason: "Use shared and object-specific data effectively.",
   sections: [
     TopicSection(
       title: "Variables in Object-Oriented Programming",

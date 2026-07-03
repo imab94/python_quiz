@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const decoratorsTopic = Topic(
   title: "Decorators",
   level: "Intermediate",
+  priority: 11,
+  isRecommended: true,
+  recommendationReason: "One of Python's most powerful interview topics.",
   sections: [
     TopicSection(
       title: "Introduction to Decorators",

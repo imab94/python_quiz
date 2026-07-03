@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const variablesTopic = Topic(
   title: "Variables",
   level: "Beginner",
+  priority: 3,
+  isRecommended: true,
+  recommendationReason: "Every Python program starts with variables.",
   sections: [
     TopicSection(
       title: "What is a Variable?",

@@ -76,3 +76,10 @@ const advancedTopics = [
   designPatternsTopic,
   metaclassesTopic,
 ];
+
+const allTopics = [
+  ...introductionTopics,
+  ...beginnerTopics,
+  ...intermediateTopics,
+  ...advancedTopics,
+];

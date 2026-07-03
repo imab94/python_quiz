@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const loopsTopic = Topic(
   title: "Loops",
   level: "Beginner",
+  priority: 5,
+  isRecommended: true,
+  recommendationReason: "Automate repetitive tasks efficiently.",
   sections: [
     TopicSection(
       title: "Introduction to Loops",

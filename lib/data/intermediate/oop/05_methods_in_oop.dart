@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const methodsInOOPTopic = Topic(
   title: "Methods in OOP",
   level: "Intermediate",
+  priority: 16,
+  isRecommended: true,
+  recommendationReason: "Organize behavior with clear and reusable methods.",
   sections: [
     TopicSection(
       title: "What is a Method?",

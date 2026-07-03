@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const polymorphismTopic = Topic(
   title: "Polymorphism",
   level: "Intermediate",
+  priority: 19,
+  isRecommended: true,
+  recommendationReason: "Write flexible code using common interfaces.",
   sections: [
     TopicSection(
       title: "What is Polymorphism?",

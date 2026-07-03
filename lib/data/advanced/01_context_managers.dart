@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const contextManagersTopic = Topic(
   title: "Context Managers",
   level: "Advanced",
+  priority: 23,
+  isRecommended: true,
+  recommendationReason: "Write cleaner and safer resource management code.",
   sections: [
     TopicSection(
       title: "What are Context Managers?",

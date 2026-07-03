@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const inheritanceTopic = Topic(
   title: "Inheritance",
   level: "Intermediate",
+  priority: 20,
+  isRecommended: true,
+  recommendationReason: "Reuse code by extending existing classes.",
   sections: [
     TopicSection(
       title: "What is Inheritance?",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const selfAndConstructorTopic = Topic(
   title: "The self Keyword and Constructors",
   level: "Intermediate",
+  priority: 14,
+  isRecommended: true,
+  recommendationReason: "Initialize objects correctly with constructors.",
   sections: [
     TopicSection(
       title: "Understanding the self Keyword",

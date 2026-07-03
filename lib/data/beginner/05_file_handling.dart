@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const fileHandlingTopic = Topic(
   title: "File Handling",
   level: "Beginner",
+  priority: 7,
+  isRecommended: true,
+  recommendationReason: "Store, read, and manage data efficiently with files.",
   sections: [
     TopicSection(
       title: "Introduction to File Handling",

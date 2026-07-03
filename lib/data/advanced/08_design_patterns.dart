@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const designPatternsTopic = Topic(
   title: "Design Patterns",
   level: "Advanced",
+  priority: 30,
+  isRecommended: true,
+  recommendationReason: "Solve common software design problems with proven solutions.",
   sections: [
     TopicSection(
       title: "What are Design Patterns?",

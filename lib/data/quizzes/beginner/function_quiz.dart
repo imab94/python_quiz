@@ -61,10 +61,9 @@ const functionsQuiz = [
   ),
 
   QuizQuestion(
-    'What will this function return?\n\n'
+    'What will this function return?\n'
         'def add(a, b):\n'
-        '    return a + b\n\n'
-        'print(add(2, 3))',
+        '    return a + b\nprint(add(2, 3))',
     [
       '5',
       '23',

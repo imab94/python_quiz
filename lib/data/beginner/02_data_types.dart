@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const dataTypesTopic = Topic(
   title: "Data Types",
   level: "Beginner",
+  priority: 4,
+  isRecommended: true,
+  recommendationReason: "Master Python's most fundamental data structures.",
   sections: [
     TopicSection(
       title: "Introduction to Data Types",

@@ -5,6 +5,9 @@ import 'package:python_quiz/models/topic_section.dart';
 const multithreadingTopic = Topic(
   title: "Multithreading",
   level: "Advanced",
+  priority: 25,
+  isRecommended: true,
+  recommendationReason: "Run multiple tasks concurrently for better responsiveness.",
   sections: [
     TopicSection(
       title: "What is Multithreading?",
