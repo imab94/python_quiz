@@ -6,8 +6,6 @@ import 'package:python_quiz/screens/topic_quiz_screen.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/screens/quiz_report_screen.dart';
-import 'package:python_quiz/services/streak_service.dart';
-import 'package:python_quiz/services/achievement_service.dart';
 import 'package:python_quiz/widgets/achievement_popup.dart';
 import 'package:python_quiz/data/achievements.dart';
 import 'package:python_quiz/services/achievement_manager.dart';

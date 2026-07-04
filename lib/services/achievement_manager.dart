@@ -94,10 +94,9 @@ class AchievementManager {
     }
 
     // =========================
-// Question Milestones
-// =========================
-
-// 100 Questions
+    // Question Milestones
+    // =========================
+    // 100 Questions
     if (totalQuestionsAnswered >= 100) {
       final unlocked =
       await AchievementService.unlockAchievement(
@@ -112,7 +111,7 @@ class AchievementManager {
       }
     }
 
-// 1000 Questions
+  // 1000 Questions
     if (totalQuestionsAnswered >= 1000) {
       final unlocked =
       await AchievementService.unlockAchievement(

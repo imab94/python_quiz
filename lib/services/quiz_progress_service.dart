@@ -83,4 +83,53 @@ class QuizProgressService {
 
     return result != null;
   }
+
+  static Future<int> getPassedQuizCount() async {
+    final quizzes = await getAllQuizResults();
+
+    int count = 0;
+
+    for (final quiz in quizzes.values) {
+      if (quiz["passed"] == true) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  static Future<double> getAveragePercentage() async {
+    final quizzes = await getAllQuizResults();
+
+    if (quizzes.isEmpty) {
+      return 0;
+    }
+
+    double total = 0;
+
+    for (final quiz in quizzes.values) {
+      total += (quiz["percentage"] as num).toDouble();
+    }
+
+    return total / quizzes.length;
+  }
+
+  static Future<bool> areAllQuizzesPassed(
+      int totalTopics,
+      ) async {
+
+    final quizzes = await getAllQuizResults();
+
+    if (quizzes.length < totalTopics) {
+      return false;
+    }
+
+    for (final quiz in quizzes.values) {
+      if (quiz["passed"] != true) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
