@@ -44,6 +44,20 @@ class CertificateBody extends StatelessWidget {
           ),
         ),
 
+        const SizedBox(height: 8),
+
+        Text(
+          certificate.finalScore == null
+              ? "Final Score: Locked"
+              : "With an Overall Score of ${certificate.finalScore!.toStringAsFixed(1)}%",
+          style: GoogleFonts.lato(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+            letterSpacing: .3,
+          ),
+        ),
+
         const SizedBox(height: 12),
 
         SizedBox(
@@ -78,7 +92,7 @@ class CertificateBody extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 5),
+        const SizedBox(height: 3),
 
         Padding(
           padding:
@@ -94,13 +108,13 @@ class CertificateBody extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 5),
+        const SizedBox(height: 0),
 
         Text(
           "Congratulations on this outstanding achievement!",
           textAlign: TextAlign.center,
           style: GoogleFonts.playfairDisplay(
-            fontSize: 22,
+            fontSize: 20,
             fontStyle: FontStyle.italic,
             color: theme.primaryColor,
             fontWeight: FontWeight.w600,

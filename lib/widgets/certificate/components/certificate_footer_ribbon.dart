@@ -11,7 +11,7 @@ class CertificateFooterRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 10,
+      height: 8,
       width: double.infinity,
       child: Stack(
         children: [

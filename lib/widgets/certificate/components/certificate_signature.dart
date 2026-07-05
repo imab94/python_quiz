@@ -21,29 +21,6 @@ class CertificateSignature extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
 
-          /// Signature Image
-          SizedBox(
-            height: 42,
-            child: certificate.isPreview
-                ? Opacity(
-              opacity: .60,
-              child: Text(
-                "Signature",
-                style: GoogleFonts.dancingScript(
-                  fontSize: 30,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-            )
-                : Image.asset(
-              "assets/images/director_signature.png",
-              height: 42,
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
           /// Signature Line
           Container(
             width: 150,
@@ -74,6 +51,22 @@ class CertificateSignature extends StatelessWidget {
               letterSpacing: .4,
             ),
           ),
+          const SizedBox(height: 6),
+          /// Signature Image
+          SizedBox(
+            height: 20,
+            width: 230,
+            child:OverflowBox(
+            maxWidth: 250,
+            maxHeight: 80,
+            child: Image.asset(
+              "assets/images/director_signature.png",
+              width: 220,
+              height: 70,
+              fit: BoxFit.contain,
+            ),
+          ),
+            ),
         ],
       ),
     );

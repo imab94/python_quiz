@@ -68,7 +68,7 @@ class CertificateTemplate extends StatelessWidget {
             /// Body
             /// ===========================
             Positioned(
-              top: 420,
+              top: 415,
               left: 120,
               right: 120,
               child: CertificateBody(certificate: certificate, theme: theme),
@@ -78,9 +78,9 @@ class CertificateTemplate extends StatelessWidget {
             /// Footer
             /// ===========================
             Positioned(
-              top: 662,
+              top: 664,
               left: 80,
-              right: 0,
+              right: 50,
               bottom: 50,
               child: CertificateFooter(
                 certificate: certificate,
@@ -92,7 +92,9 @@ class CertificateTemplate extends StatelessWidget {
             /// ===========================
             if (certificate.isPreview)
               const Positioned.fill(
-                child: IgnorePointer(child: CertificateWatermark()),
+                child: IgnorePointer(
+                    child: CertificateWatermark()
+                ),
               ),
           ],
         ),

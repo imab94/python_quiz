@@ -7,7 +7,7 @@ class CertificateWatermark extends StatelessWidget {
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Opacity(
-        opacity: 0.06,
+        opacity: 0.1,
         child: Stack(
           children: const [
             _WatermarkText(

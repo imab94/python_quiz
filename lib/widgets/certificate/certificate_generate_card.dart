@@ -7,13 +7,15 @@ class CertificateGenerateCard extends StatelessWidget {
     required this.selectedLevel,
     required this.earnedLevel,
     required this.onGenerate,
+    required this.isVerified,
   });
 
   final CertificateLevel selectedLevel;
   final CertificateLevel earnedLevel;
   final VoidCallback onGenerate;
+  final bool isVerified;
 
-  bool get isUnlocked => selectedLevel == earnedLevel;
+  bool get isUnlocked => isVerified;
 
   @override
   Widget build(BuildContext context) {

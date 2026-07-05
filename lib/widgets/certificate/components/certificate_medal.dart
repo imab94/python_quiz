@@ -115,7 +115,7 @@ class _Ribbon extends StatelessWidget {
       clipper: _RibbonClipper(),
       child: Container(
         width: 22,
-        height: 58,
+        height: 50,
         decoration: BoxDecoration(
           gradient: gradient,
         ),

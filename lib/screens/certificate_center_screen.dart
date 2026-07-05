@@ -48,12 +48,9 @@ class _CertificateCenterScreenState
     _earnedLevel = level;
     _selectedLevel = level;
 
-    final certificate = eligible
-        ? await CertificateService.generateCertificate(
-      learnerName: "Arun Bhardwaj",
-    )
-        : await CertificateService.generatePreviewCertificate(
-      learnerName: "Arun Bhardwaj",
+    final certificate =
+    await CertificateService.generateCertificate(
+      learnerName: "John Doe",
     );
 
     if (!mounted) return;
@@ -154,6 +151,7 @@ class _CertificateCenterScreenState
                         CertificateGenerateCard(
                           selectedLevel: _selectedLevel,
                           earnedLevel: _earnedLevel,
+                          isVerified: certificate.isVerified,
                           onGenerate: () async {
 
                             if (_certificateKey.currentContext == null) return;
@@ -192,7 +190,7 @@ class _CertificateCenterScreenState
 
   Certificate _previewFor(CertificateLevel level) {
     return Certificate(
-      learnerName: "Arun Bhardwaj",
+      learnerName: "John Doe",
       courseName: "Python Mastery",
       level: level,
       averageScore: switch (level) {
@@ -213,11 +211,12 @@ class _CertificateCenterScreenState
       },
       totalTopics: 30,
       issuedDate: DateTime.now(),
-      certificateId: "PY-${level.name.toUpperCase()}-000001",
+      certificateId: "PENDING",
       organizationName: "PYTHON LEARNING PLATFORM",
       directorName: "Python Learning Platform",
       directorTitle: "Course Director",
       verificationUrl: "",
+      finalScore: null,
       isVerified: _isEligible && level == _earnedLevel,
       isPreview: !_isEligible || level != _earnedLevel,
     );

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:python_quiz/models/certificate.dart';
 
-import '../components/certificate_footer_ribbon.dart';
 import '../components/certificate_qr.dart';
 import '../components/certificate_seal.dart';
 import '../components/certificate_signature.dart';
@@ -42,7 +41,7 @@ class CertificateFooter extends StatelessWidget {
               /// SEAL
               /// ==========================
               Expanded(
-                flex: 18,
+                flex: 15,
                 child: Center(
                   child: CertificateSeal(
                     level: certificate.level,
@@ -54,7 +53,7 @@ class CertificateFooter extends StatelessWidget {
               /// SIGNATURE
               /// ==========================
               Expanded(
-                flex: 18,
+                flex: 14,
                 child: CertificateSignature(
                   certificate: certificate,
                 ),
@@ -65,9 +64,12 @@ class CertificateFooter extends StatelessWidget {
               /// ==========================
               /// QR
               /// ==========================
-              CertificateQr(
-                certificate: certificate,
-              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 5),
+                child: CertificateQr(
+                  certificate: certificate,
+                ),
+              )
             ],
           ),
         ),
@@ -93,12 +95,9 @@ class CertificateFooter extends StatelessWidget {
         ),
 
         const SizedBox(height: 4),
-
         Text(
-          certificate.isPreview
-              ? "-- --- ----"
-              : DateFormat("dd MMM, yyyy").format(
-            certificate.issuedDate,
+          DateFormat("dd MMM, yyyy").format(
+          certificate.issuedDate,
           ),
           style: GoogleFonts.lato(
             fontSize: 16,
@@ -129,9 +128,7 @@ class CertificateFooter extends StatelessWidget {
         const SizedBox(height: 4),
 
         Text(
-          certificate.isPreview
-              ? "PY-XXXXXX"
-              : certificate.certificateId,
+          certificate.certificateId,
           style: GoogleFonts.lato(
             fontSize: 13,
             fontWeight: FontWeight.bold,

@@ -7,33 +7,27 @@ enum CertificateLevel {
 class Certificate {
   /// Learner
   final String learnerName;
-
   /// Course
   final String courseName;
-
   /// Bronze / Silver / Gold
   final CertificateLevel level;
-
   /// Completion statistics
   final int topicsCompleted;
   final int totalTopics;
   final int quizzesPassed;
   final int totalQuizzes;
   final double averageScore;
-
+  final double? finalScore;
   /// Certificate information
   final DateTime issuedDate;
   final String certificateId;
-
   /// Verification
   final bool isVerified;
   final bool isPreview;
-
   /// Organization
   final String organizationName;
   final String directorName;
   final String directorTitle;
-
   /// Verification URL (future QR code)
   final String? verificationUrl;
 
@@ -47,6 +41,7 @@ class Certificate {
     required this.totalQuizzes,
     required this.averageScore,
     required this.issuedDate,
+    this.finalScore,
     required this.certificateId,
     required this.isVerified,
     required this.isPreview,
@@ -73,6 +68,7 @@ class Certificate {
     String? directorName,
     String? directorTitle,
     String? verificationUrl,
+    double? finalScore,
   }) {
     return Certificate(
       learnerName: learnerName ?? this.learnerName,
@@ -83,6 +79,7 @@ class Certificate {
       quizzesPassed: quizzesPassed ?? this.quizzesPassed,
       totalQuizzes: totalQuizzes ?? this.totalQuizzes,
       averageScore: averageScore ?? this.averageScore,
+      finalScore: finalScore ?? this.finalScore,
       issuedDate: issuedDate ?? this.issuedDate,
       certificateId: certificateId ?? this.certificateId,
       isVerified: isVerified ?? this.isVerified,

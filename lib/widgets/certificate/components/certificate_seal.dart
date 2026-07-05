@@ -68,10 +68,10 @@ class CertificateSeal extends StatelessWidget {
           ),
 
           Transform.translate(
-            offset: const Offset(0, -5),
+            offset: const Offset(0, -10),
             child: Container(
-              width: 86,
-              height: 86,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(

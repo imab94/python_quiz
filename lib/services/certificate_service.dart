@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:intl/intl.dart';
 import 'package:python_quiz/data/topics.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/services/completed_service.dart';
@@ -59,11 +62,7 @@ class CertificateService {
 
 
   static Future<String> generateCertificateId() async {
-
-    final year = DateTime.now().year;
-
-    final level =
-    await getCertificateLevel();
+    final level = await getCertificateLevel();
 
     final levelCode = switch (level) {
       CertificateLevel.gold => "G",
@@ -71,42 +70,12 @@ class CertificateService {
       CertificateLevel.bronze => "B",
     };
 
-    return "PY-$year-$levelCode-000001";
-  }
+    final date = DateFormat('yyyyMMdd').format(DateTime.now());
 
-  static Future<Certificate> generatePreviewCertificate({
-    required String learnerName,
-  }) async {
+    final random = Random.secure();
+    final number = (100000 + random.nextInt(900000)).toString();
 
-    final completedTopics =
-    await CompletedService.getCompletedTopics();
-
-    final quizzesPassed =
-    await QuizProgressService.getPassedQuizCount();
-
-    final average =
-    await getAverageScore();
-
-    final level =
-    await getCertificateLevel();
-
-    return Certificate(
-      learnerName: learnerName,
-      courseName: "Python Learning Path",
-      level: level,
-      topicsCompleted: completedTopics.length,
-      totalTopics: totalTopics,
-      quizzesPassed: quizzesPassed,
-      totalQuizzes: totalTopics,
-      averageScore: average,
-      issuedDate: DateTime.now(), // we'll hide this in preview
-      certificateId: "PREVIEW",
-      directorName: "Arun Bhardwaj",
-      directorTitle: "Founder • Python Learning Platform",
-      isVerified: false,
-      isPreview: true,
-      organizationName: "Python Master"
-    );
+    return "PY-$levelCode-$date-$number";
   }
 
   static Future<Certificate> generateCertificate({
@@ -115,12 +84,6 @@ class CertificateService {
 
     final eligible = await isEligible();
 
-    if (!eligible) {
-      throw Exception(
-        "Certificate requirements have not been completed.",
-      );
-    }
-
     final completedTopics =
     await CompletedService.getCompletedTopics();
 
@@ -132,9 +95,7 @@ class CertificateService {
 
     final level =
     await getCertificateLevel();
-
-    final certificateId =
-    await generateCertificateId();
+    final certificateId = await generateCertificateId();
 
     return Certificate(
       learnerName: learnerName,
@@ -145,12 +106,15 @@ class CertificateService {
       quizzesPassed: quizzesPassed,
       totalQuizzes: totalTopics,
       averageScore: average,
+      finalScore: eligible ? average : null,
       issuedDate: DateTime.now(),
       certificateId: certificateId,
+      verificationUrl:
+      "https://pythonlearningplatform.com/verify/$certificateId",
       directorName: "Arun Bhardwaj",
       directorTitle: "Founder • Python Learning Platform",
-      isVerified: true,
-      isPreview: false,
+      isVerified: eligible,
+      isPreview: !eligible,
       organizationName: "Python Master"
     );
   }
