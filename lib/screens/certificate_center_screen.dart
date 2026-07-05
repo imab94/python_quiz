@@ -98,7 +98,7 @@ class _CertificateCenterScreenState
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 18),
 
                 Expanded(
                   child: _isLoading
@@ -118,7 +118,7 @@ class _CertificateCenterScreenState
                           },
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 14),
 
                         Center(
                           child: ConstrainedBox(
@@ -149,9 +149,16 @@ class _CertificateCenterScreenState
                         const SizedBox(height: 16),
 
                         CertificateGenerateCard(
-                          selectedLevel: _selectedLevel,
-                          earnedLevel: _earnedLevel,
+                          topicsCompleted: certificate.topicsCompleted,
+                          totalTopics: certificate.totalTopics,
+
+                          quizzesPassed: certificate.quizzesPassed,
+                          totalQuizzes: certificate.totalQuizzes,
+
+                          averageScore: certificate.averageScore,
+
                           isVerified: certificate.isVerified,
+
                           onGenerate: () async {
 
                             if (_certificateKey.currentContext == null) return;

@@ -20,82 +20,47 @@ class CertificateRewardCard extends StatelessWidget {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.12),
         borderRadius: BorderRadius.circular(22),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Text(
-              "Certificate Gallery",
-              style: GoogleFonts.lato(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+      child: Row(
+        children: [
+          Expanded(
+            child: CertificateLevelCard(
+              level: CertificateLevel.bronze,
+              selected: selectedLevel == CertificateLevel.bronze,
+              unlocked: _isUnlocked(CertificateLevel.bronze),
+              onTap: () => onLevelChanged(CertificateLevel.bronze),
             ),
+          ),
 
-            const SizedBox(height: 6),
+          const SizedBox(width: 6),
 
-            Text(
-              "Preview every certificate level before unlocking it.",
-              style: GoogleFonts.lato(
-                color: Colors.grey.shade700,
-              ),
+          Expanded(
+            child: CertificateLevelCard(
+              level: CertificateLevel.silver,
+              selected: selectedLevel == CertificateLevel.silver,
+              unlocked: _isUnlocked(CertificateLevel.silver),
+              onTap: () => onLevelChanged(CertificateLevel.silver),
             ),
+          ),
 
-            const SizedBox(height: 22),
+          const SizedBox(width: 6),
 
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CertificateLevelCard(
-                  level: CertificateLevel.bronze,
-                  selected:
-                  selectedLevel == CertificateLevel.bronze,
-                  unlocked:
-                  _isUnlocked(CertificateLevel.bronze),
-                  onTap: () {
-                    onLevelChanged(
-                      CertificateLevel.bronze,
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                CertificateLevelCard(
-                  level: CertificateLevel.silver,
-                  selected:
-                  selectedLevel == CertificateLevel.silver,
-                  unlocked:
-                  _isUnlocked(CertificateLevel.silver),
-                  onTap: () {
-                    onLevelChanged(
-                      CertificateLevel.silver,
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                CertificateLevelCard(
-                  level: CertificateLevel.gold,
-                  selected:
-                  selectedLevel == CertificateLevel.gold,
-                  unlocked:
-                  _isUnlocked(CertificateLevel.gold),
-                  onTap: () {
-                    onLevelChanged(
-                      CertificateLevel.gold,
-                    );
-                  },
-                ),
-              ],
+          Expanded(
+            child: CertificateLevelCard(
+              level: CertificateLevel.gold,
+              selected: selectedLevel == CertificateLevel.gold,
+              unlocked: _isUnlocked(CertificateLevel.gold),
+              onTap: () => onLevelChanged(CertificateLevel.gold),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -27,10 +27,13 @@ class CertificateLevelCard extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           margin: const EdgeInsets.symmetric(horizontal: 6),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 8,
+          ),
           decoration: BoxDecoration(
             color: selected
-                ? theme.primaryColor.withValues(alpha: .12)
+                ? const Color(0xff4F2DBA)
                 : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
@@ -49,9 +52,10 @@ class CertificateLevelCard extends StatelessWidget {
             ],
           ),
           child: SizedBox(
-            height: 170,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            height: 104,
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
                 Text(
@@ -60,58 +64,49 @@ class CertificateLevelCard extends StatelessWidget {
                     CertificateLevel.silver => "🥈",
                     CertificateLevel.gold => "🥇",
                   },
-                  style: const TextStyle(fontSize: 34),
+                  style: const TextStyle(fontSize: 15),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 2),
 
-                SizedBox(
-                  height: 34,
-                  child: Center(
-                    child: Text(
-                      theme.levelName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.lato(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: theme.titleColor,
-                      ),
-                    ),
+                Text(
+                  theme.levelName,
+                  style: GoogleFonts.lato(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: selected
+                        ? Colors.white
+                        : theme.titleColor,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
 
                 Text(
                   "${theme.minPercentage}-${theme.maxPercentage}%",
                   style: GoogleFonts.lato(
-                    color: Colors.grey.shade700,
-                    fontSize: 13,
+                    fontSize: 11,
+                    color: selected
+                        ? Colors.white70
+                        : Colors.grey.shade700,
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 4),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    const SizedBox(width: 4),
-                    Icon(
-                      unlocked
-                          ? Icons.check_circle
-                          : Icons.lock,
-                      size: 20,
-                      color: unlocked
-                          ? Colors.green
-                          : Colors.grey,
-                    ),
-                  ],
+                Icon(
+                  unlocked
+                      ? Icons.check_circle
+                      : Icons.lock_outline_rounded,
+                  color: selected
+                      ? Colors.white
+                      : unlocked
+                      ? Colors.green
+                      : Colors.grey,
+                  size: 18,
                 ),
               ],
-            ),
+            )
           ),
       ),
     );
