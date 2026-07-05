@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:python_quiz/screens/certificate_center_screen.dart';
 import 'package:python_quiz/screens/learn_python_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
 import 'package:python_quiz/services/achievement_service.dart';
@@ -477,6 +478,21 @@ class _StartScreenState extends State<StartScreen> {
 
                   await refreshDashboard();
                 },
+              ),
+
+              const SizedBox(height: 18),
+
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CertificateCenterScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.workspace_premium),
+                label: const Text("Certificate Center"),
               ),
 
               const SizedBox(height: 18),

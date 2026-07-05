@@ -1,162 +1,176 @@
 import 'package:flutter/material.dart';
-import 'package:python_quiz/models/certificate.dart';
+
+import 'package:python_quiz/models/certificate_theme.dart';
 
 class CertificateBorder extends StatelessWidget {
   const CertificateBorder({
     super.key,
-    required this.level,
+    required this.theme,
     required this.child,
   });
 
-  final CertificateLevel level;
+  final CertificateThemeData theme;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final theme = _theme(level);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.backgroundColor,
-
-        borderRadius: BorderRadius.circular(28),
-
-        border: Border.all(
-          color: theme.primaryColor,
-          width: 6,
-        ),
-
-        boxShadow: [
-          BoxShadow(
-            color: theme.primaryColor.withValues(alpha: .18),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-
-            border: Border.all(
-              color: theme.secondaryColor,
-              width: 1.5,
-            ),
-          ),
-          child: Stack(
-            children: [
-
-              /// Main certificate
-              Padding(
-                padding: const EdgeInsets.all(30),
-                child: child,
-              ),
-
-              /// Top Left Ornament
-              Positioned(
-                top: 14,
-                left: 14,
-                child: _CornerDecoration(
-                  color: theme.primaryColor,
-                ),
-              ),
-
-              /// Top Right Ornament
-              Positioned(
-                top: 14,
-                right: 14,
-                child: Transform.rotate(
-                  angle: 1.57,
-                  child: _CornerDecoration(
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ),
-
-              /// Bottom Left Ornament
-              Positioned(
-                bottom: 14,
-                left: 14,
-                child: Transform.rotate(
-                  angle: -1.57,
-                  child: _CornerDecoration(
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ),
-
-              /// Bottom Right Ornament
-              Positioned(
-                bottom: 14,
-                right: 14,
-                child: Transform.rotate(
-                  angle: 3.14,
-                  child: _CornerDecoration(
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return CustomPaint(
+      painter: _CertificateBorderPainter(theme),
+      child: child,
     );
-  }
-
-  _CertificateTheme _theme(CertificateLevel level) {
-    switch (level) {
-      case CertificateLevel.gold:
-        return const _CertificateTheme(
-          primaryColor: Color(0xFFD4AF37),
-          secondaryColor: Color(0xFFE8C75F),
-          backgroundColor: Color(0xFFFFFCF3),
-        );
-
-      case CertificateLevel.silver:
-        return const _CertificateTheme(
-          primaryColor: Color(0xFF9E9E9E),
-          secondaryColor: Color(0xFFD6D6D6),
-          backgroundColor: Color(0xFFFDFDFD),
-        );
-
-      case CertificateLevel.bronze:
-        return const _CertificateTheme(
-          primaryColor: Color(0xFFB87333),
-          secondaryColor: Color(0xFFD89A63),
-          backgroundColor: Color(0xFFFFF9F4),
-        );
-    }
   }
 }
 
-class _CornerDecoration extends StatelessWidget {
-  const _CornerDecoration({
-    required this.color,
-  });
+class _CertificateBorderPainter extends CustomPainter {
+  const _CertificateBorderPainter(this.theme);
 
-  final Color color;
+  final CertificateThemeData theme;
 
   @override
-  Widget build(BuildContext context) {
-    return Icon(
-      Icons.auto_awesome,
-      color: color.withValues(alpha: .55),
-      size: 26,
+  void paint(Canvas canvas, Size size) {
+    final outer = Paint()
+      ..color = theme.borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    final middle = Paint()
+      ..color = theme.primaryColor.withOpacity(.45)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8;
+
+    final inner = Paint()
+      ..color = theme.primaryColor.withOpacity(.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    const outerGap = 24.0;
+    const middleGap = 38.0;
+    const innerGap = 50.0;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          outerGap,
+          outerGap,
+          size.width - outerGap * 2,
+          size.height - outerGap * 2,
+        ),
+        const Radius.circular(6),
+      ),
+      outer,
+    );
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          middleGap,
+          middleGap,
+          size.width - middleGap * 2,
+          size.height - middleGap * 2,
+        ),
+        const Radius.circular(4),
+      ),
+      middle,
+    );
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          innerGap,
+          innerGap,
+          size.width - innerGap * 2,
+          size.height - innerGap * 2,
+        ),
+        const Radius.circular(2),
+      ),
+      inner,
+    );
+
+    _drawCorner(
+      canvas,
+      const Offset(58, 58),
+      false,
+      false,
+    );
+
+    _drawCorner(
+      canvas,
+      Offset(size.width - 58, 58),
+      true,
+      false,
+    );
+
+    _drawCorner(
+      canvas,
+      Offset(58, size.height - 58),
+      false,
+      true,
+    );
+
+    _drawCorner(
+      canvas,
+      Offset(size.width - 58, size.height - 58),
+      true,
+      true,
     );
   }
-}
 
-class _CertificateTheme {
-  final Color primaryColor;
-  final Color secondaryColor;
-  final Color backgroundColor;
+  void _drawCorner(
+      Canvas canvas,
+      Offset origin,
+      bool flipX,
+      bool flipY,
+      ) {
+    canvas.save();
 
-  const _CertificateTheme({
-    required this.primaryColor,
-    required this.secondaryColor,
-    required this.backgroundColor,
-  });
+    canvas.translate(origin.dx, origin.dy);
+
+    canvas.scale(
+      flipX ? -1 : 1,
+      flipY ? -1 : 1,
+    );
+
+    final paint = Paint()
+      ..color = theme.primaryColor.withOpacity(.75)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+
+    final light = Paint()
+      ..color = theme.primaryColor.withOpacity(.30)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    canvas.drawLine(
+      const Offset(0, 18),
+      const Offset(0, 0),
+      paint,
+    );
+
+    canvas.drawLine(
+      const Offset(0, 0),
+      const Offset(18, 0),
+      paint,
+    );
+
+    canvas.drawArc(
+      const Rect.fromLTWH(0, 0, 28, 28),
+      3.14159,
+      1.5708,
+      false,
+      paint,
+    );
+
+    canvas.drawArc(
+      const Rect.fromLTWH(8, 8, 12, 12),
+      3.14159,
+      1.5708,
+      false,
+      light,
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

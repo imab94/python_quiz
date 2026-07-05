@@ -1,250 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../models/certificate.dart';
+import 'package:python_quiz/models/certificate.dart';
+import 'package:python_quiz/widgets/certificate/certificate_level_card.dart';
 
 class CertificateRewardCard extends StatelessWidget {
   const CertificateRewardCard({
     super.key,
-    required this.currentLevel,
+    required this.selectedLevel,
+    required this.earnedLevel,
+    required this.onLevelChanged,
   });
 
-  final CertificateLevel currentLevel;
+  final CertificateLevel selectedLevel;
+  final CertificateLevel earnedLevel;
+  final ValueChanged<CertificateLevel> onLevelChanged;
+
+  bool _isUnlocked(CertificateLevel level) {
+    return level.index <= earnedLevel.index;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(top: 24),
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .08),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white24,
-        ),
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          Text(
-            "Certificate Levels",
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          _levelTile(
-            level: CertificateLevel.bronze,
-            emoji: "🥉",
-            title: "Bronze",
-            subtitle: "70% - 84%",
-          ),
-
-          const SizedBox(height: 14),
-
-          _levelTile(
-            level: CertificateLevel.silver,
-            emoji: "🥈",
-            title: "Silver",
-            subtitle: "85% - 94%",
-          ),
-
-          const SizedBox(height: 14),
-
-          _levelTile(
-            level: CertificateLevel.gold,
-            emoji: "🥇",
-            title: "Gold",
-            subtitle: "95% - 100%",
-          ),
-
-          const SizedBox(height: 28),
-
-          _nextMilestone(),
-        ],
-      ),
-    );
-  }
-
-  Widget _nextMilestone() {
-
-    if (currentLevel == CertificateLevel.gold) {
-
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.green.withValues(alpha: .12),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Colors.greenAccent,
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            const Icon(
-              Icons.emoji_events,
-              color: Colors.amber,
-              size: 40,
-            ),
-
-            const SizedBox(height: 12),
-
             Text(
-              "Congratulations!",
+              "Certificate Gallery",
               style: GoogleFonts.lato(
-                color: Colors.white,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             Text(
-              "You've achieved the highest certification level.",
-              textAlign: TextAlign.center,
+              "Preview every certificate level before unlocking it.",
               style: GoogleFonts.lato(
-                color: Colors.white70,
+                color: Colors.grey.shade700,
               ),
             ),
-          ],
-        ),
-      );
-    }
 
-    final nextLevel =
-    currentLevel == CertificateLevel.bronze
-        ? "Silver"
-        : "Gold";
+            const SizedBox(height: 22),
 
-    final required =
-    currentLevel == CertificateLevel.bronze
-        ? 85
-        : 95;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .05),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white24,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          Text(
-            "🎯 Next Goal",
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            "$nextLevel Certificate",
-            style: GoogleFonts.lato(
-              color: Colors.amber,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            "Reach an average score of $required% to unlock it.",
-            style: GoogleFonts.lato(
-              color: Colors.white70,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _levelTile({
-    required CertificateLevel level,
-    required String emoji,
-    required String title,
-    required String subtitle,
-  }) {
-
-    final selected = currentLevel == level;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: selected
-            ? Colors.amber.withValues(alpha: .18)
-            : Colors.white.withValues(alpha: .04),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: selected
-              ? Colors.amber
-              : Colors.white24,
-          width: selected ? 2 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
-
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 28),
-          ),
-
-          const SizedBox(width: 16),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                Text(
-                  title,
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                CertificateLevelCard(
+                  level: CertificateLevel.bronze,
+                  selected:
+                  selectedLevel == CertificateLevel.bronze,
+                  unlocked:
+                  _isUnlocked(CertificateLevel.bronze),
+                  onTap: () {
+                    onLevelChanged(
+                      CertificateLevel.bronze,
+                    );
+                  },
                 ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  subtitle,
-                  style: GoogleFonts.lato(
-                    color: Colors.white70,
-                  ),
+                const SizedBox(width: 10),
+                CertificateLevelCard(
+                  level: CertificateLevel.silver,
+                  selected:
+                  selectedLevel == CertificateLevel.silver,
+                  unlocked:
+                  _isUnlocked(CertificateLevel.silver),
+                  onTap: () {
+                    onLevelChanged(
+                      CertificateLevel.silver,
+                    );
+                  },
+                ),
+                const SizedBox(width: 10),
+                CertificateLevelCard(
+                  level: CertificateLevel.gold,
+                  selected:
+                  selectedLevel == CertificateLevel.gold,
+                  unlocked:
+                  _isUnlocked(CertificateLevel.gold),
+                  onTap: () {
+                    onLevelChanged(
+                      CertificateLevel.gold,
+                    );
+                  },
                 ),
               ],
             ),
-          ),
-
-          if (selected)
-            const Icon(
-              Icons.check_circle,
-              color: Colors.amber,
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -60,7 +60,7 @@ class _CertificatePreviewScreenState
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SingleChildScrollView(
-                child: CertificateWidget(
+                child: CertificateTemplate(
                   certificate: widget.certificate,
                   repaintKey: _certificateKey,
                 ),

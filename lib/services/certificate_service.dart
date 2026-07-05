@@ -105,6 +105,7 @@ class CertificateService {
       directorTitle: "Founder • Python Learning Platform",
       isVerified: false,
       isPreview: true,
+      organizationName: "Python Master"
     );
   }
 
@@ -150,6 +151,7 @@ class CertificateService {
       directorTitle: "Founder • Python Learning Platform",
       isVerified: true,
       isPreview: false,
+      organizationName: "Python Master"
     );
   }
 

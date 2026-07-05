@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
-
-import '../../models/certificate.dart';
-import 'certificate_border.dart';
+import 'package:python_quiz/models/certificate.dart';
 
 class CertificateLandscape extends StatelessWidget {
   const CertificateLandscape({
     super.key,
-    required this.certificate,
     required this.child,
+    required this.certificate,
   });
 
-  final Certificate certificate;
   final Widget child;
+  final Certificate certificate;
+
+  static const double canvasWidth = 1200;
+  static const double canvasHeight = 850;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AspectRatio(
-        aspectRatio: 1.414, // A4 Landscape
-
-        child: CertificateBorder(
-          level: certificate.level,
-
-          child: child,
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Center(
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: SizedBox(
+              width: canvasWidth,
+              height: canvasHeight,
+              child: Material(
+                color: const Color(0xffFCFBF8),
+                elevation: 12,
+                shadowColor: Colors.black26,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: child,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../models/certificate.dart';
+import 'package:python_quiz/models/certificate.dart';
 
 class CertificateStudent extends StatelessWidget {
   const CertificateStudent({
@@ -17,93 +17,73 @@ class CertificateStudent extends StatelessWidget {
     return Column(
       children: [
 
+        /// Student Name
         Text(
-          "This certifies that",
-          style: GoogleFonts.lato(
-            fontSize: 18,
-            color: Colors.grey.shade700,
-            letterSpacing: 1,
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        Row(
-          children: [
-
-            Expanded(
-              child: Divider(
-                color: primaryColor.withValues(alpha: .35),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Icon(
-                Icons.auto_awesome,
-                color: primaryColor,
-                size: 18,
-              ),
-            ),
-
-            Expanded(
-              child: Divider(
-                color: primaryColor.withValues(alpha: .35),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 18),
-
-        Text(
-          certificate.learnerName,
+          certificate.learnerName.toUpperCase(),
           textAlign: TextAlign.center,
-          style: GoogleFonts.dancingScript(
-            fontSize: 60,
+          style: GoogleFonts.cinzel(
+            fontSize: 42,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Container(
-          width: 320,
-          height: 1.5,
-          color: primaryColor.withValues(alpha: .35),
-        ),
-
-        const SizedBox(height: 22),
-
-        Text(
-          "has successfully completed the",
-          style: GoogleFonts.lato(
-            fontSize: 18,
-            color: Colors.grey.shade700,
+            color: primaryColor,
+            letterSpacing: 2,
           ),
         ),
 
         const SizedBox(height: 12),
 
-        Text(
-          "Python Learning Path",
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            color: primaryColor,
+        Container(
+          width: 360,
+          height: 2,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                primaryColor,
+                Colors.transparent,
+              ],
+            ),
           ),
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 28),
 
         Text(
-          "including all learning modules and assessments",
+          "FOR SUCCESSFULLY COMPLETING",
           textAlign: TextAlign.center,
           style: GoogleFonts.lato(
             fontSize: 15,
-            color: Colors.grey.shade600,
-            height: 1.4,
+            letterSpacing: 3,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        Text(
+          certificate.courseName,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+
+        const SizedBox(height: 18),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 80,
+          ),
+          child: Text(
+            "This certifies that the learner has successfully completed the course requirements and demonstrated strong knowledge of Python programming, problem solving, object-oriented programming, file handling, testing and modern development practices.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.lato(
+              fontSize: 15,
+              height: 1.7,
+              color: Colors.black87,
+            ),
           ),
         ),
       ],
