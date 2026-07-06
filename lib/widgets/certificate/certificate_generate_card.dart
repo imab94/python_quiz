@@ -180,7 +180,7 @@ class CertificateGenerateCard extends StatelessWidget {
                           ? "Your certificate is now officially verified and ready to download."
                           : "Earn at least 70% overall score and complete all topics & quizzes.",
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.white60,
                         height: 1.4,
                       ),
                     ),

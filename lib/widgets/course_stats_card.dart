@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/widgets/stat_item.dart';
 
 import '../data/all_topics.dart';
@@ -10,80 +9,88 @@ class CourseStatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int totalTopics = allTopics.length;
-    final int totalQuizQuestions = allTopics.fold(0,
+    final int totalLevels =
+        allTopics.map((topic) => topic.level).toSet().length;
+    final int totalQuizQuestions = allTopics.fold(
+      0,
           (sum, topic) => sum + topic.quizQuestions.length,
     );
-    final int totalLevels = allTopics.map((t) => t.level).toSet().length;
 
-    final totalMinutes = totalTopics * 15;
+    const int estimatedMinutesPerTopic = 15;
 
-    final totalHours = (totalMinutes / 60).ceil();
+    final int totalEstimatedMinutes =
+        totalTopics * estimatedMinutesPerTopic;
+
+    final int totalHours =
+    (totalEstimatedMinutes / 60).ceil();
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 16,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: .08),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: .10)),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .10),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            "Course Overview",
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
+          Expanded(
+            child: StatItem(
+              icon: Icons.menu_book_rounded,
+              value: "$totalTopics",
+              label: "Topics",
+              color: Colors.amber,
             ),
           ),
 
-          const SizedBox(height: 8),
+          _divider(),
 
-          Text(
-            "Everything you need to become a Python developer.",
-            style: GoogleFonts.lato(color: Colors.white70, fontSize: 15),
+          Expanded(
+            child: StatItem(
+              icon: Icons.quiz_rounded,
+              value: "$totalQuizQuestions",
+              label: "Questions",
+              color: Colors.lightBlueAccent,
+            ),
           ),
 
-          const SizedBox(height: 28),
+          _divider(),
 
-          Row(
-            children: [
-              StatItem(
-                icon: Icons.menu_book_rounded,
-                value: "$totalTopics+",
-                label: "Topics",
-                color: Colors.amber,
-              ),
-               StatItem(
-                icon: Icons.quiz_rounded,
-                value: "$totalQuizQuestions+",
-                label: "Questions",
-                color: Colors.lightBlueAccent,
-              ),
-            ],
+          Expanded(
+            child: StatItem(
+              icon: Icons.layers_rounded,
+              value: "$totalLevels",
+              label: "Levels",
+              color: Colors.greenAccent,
+            ),
           ),
 
-          SizedBox(height: 24),
+          _divider(),
 
-          Row(
-            children: [
-              StatItem(
-                icon: Icons.layers_rounded,
-                value: "$totalLevels",
-                label: "Levels",
-                color: Colors.greenAccent,
-              ),
-               StatItem(
-                icon: Icons.schedule_rounded,
-                value: "$totalHours+",
-                label: "Hours",
-                color: Colors.orangeAccent,
-              ),
-            ],
+          Expanded(
+            child: StatItem(
+              icon: Icons.schedule_rounded,
+              value: "$totalHours+",
+              label: "Hours",
+              color: Colors.orangeAccent,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _divider() {
+    return Container(
+      width: 1,
+      height: 40,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      color: Colors.white.withValues(alpha: .10),
     );
   }
 }

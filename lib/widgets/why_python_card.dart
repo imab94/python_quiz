@@ -38,7 +38,7 @@ class WhyPythonCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 20),
 
           const Row(
             children: [

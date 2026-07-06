@@ -64,8 +64,8 @@ class _CertificateCenterScreenState
 
   @override
   Widget build(BuildContext context) {
-
-    final certificate = (_certificate ?? _previewFor(_selectedLevel)).copyWith(
+    final certificate =
+    (_certificate ?? _previewFor(_selectedLevel)).copyWith(
       level: _selectedLevel,
     );
 
@@ -76,30 +76,74 @@ class _CertificateCenterScreenState
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                Text(
-                  "Python Certification",
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                /// =========================
+                /// Header
+                /// =========================
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                const SizedBox(height: 8),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      splashRadius: 22,
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
 
-                Text(
-                  "Become a Certified Python Developer",
-                  style: GoogleFonts.lato(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                    const SizedBox(width: 6),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Text(
+                            "Python Certification",
+                            style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            "Become a Certified Python Developer",
+                            style: GoogleFonts.lato(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    IconButton(
+                      onPressed: () {
+                        // TODO:
+                        // Show certificate information dialog
+                      },
+                      splashRadius: 22,
+                      icon: const Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 18),
 
+                /// =========================
+                /// Body
+                /// =========================
                 Expanded(
                   child: _isLoading
                       ? const Center(
@@ -108,6 +152,8 @@ class _CertificateCenterScreenState
                       : SingleChildScrollView(
                     child: Column(
                       children: [
+
+                        /// Bronze / Silver / Gold
                         CertificateRewardCard(
                           selectedLevel: _selectedLevel,
                           earnedLevel: _earnedLevel,
@@ -120,23 +166,28 @@ class _CertificateCenterScreenState
 
                         const SizedBox(height: 14),
 
+                        /// Certificate Preview
                         Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(
                               maxWidth: 900,
                             ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius:
+                              BorderRadius.circular(18),
                               child: AnimatedScale(
                                 scale: 1,
-                                duration: const Duration(milliseconds: 250),
+                                duration: const Duration(
+                                  milliseconds: 250,
+                                ),
                                 child: AspectRatio(
                                   key: ValueKey(_selectedLevel),
                                   aspectRatio: 1200 / 850,
                                   child: SizedBox(
                                     height: 320,
                                     child: CertificateTemplate(
-                                      repaintKey: _certificateKey,
+                                      repaintKey:
+                                      _certificateKey,
                                       certificate: certificate,
                                     ),
                                   ),
@@ -148,30 +199,41 @@ class _CertificateCenterScreenState
 
                         const SizedBox(height: 16),
 
+                        /// Status + Generate
                         CertificateGenerateCard(
-                          topicsCompleted: certificate.topicsCompleted,
-                          totalTopics: certificate.totalTopics,
-
-                          quizzesPassed: certificate.quizzesPassed,
-                          totalQuizzes: certificate.totalQuizzes,
-
-                          averageScore: certificate.averageScore,
-
-                          isVerified: certificate.isVerified,
-
+                          topicsCompleted:
+                          certificate.topicsCompleted,
+                          totalTopics:
+                          certificate.totalTopics,
+                          quizzesPassed:
+                          certificate.quizzesPassed,
+                          totalQuizzes:
+                          certificate.totalQuizzes,
+                          averageScore:
+                          certificate.averageScore,
+                          isVerified:
+                          certificate.isVerified,
                           onGenerate: () async {
 
-                            if (_certificateKey.currentContext == null) return;
+                            if (_certificateKey
+                                .currentContext ==
+                                null) {
+                              return;
+                            }
 
                             final path =
-                            await CertificateExportService.exportImage(
-                              repaintKey: _certificateKey,
-                              certificate: certificate,
+                            await CertificateExportService
+                                .exportImage(
+                              repaintKey:
+                              _certificateKey,
+                              certificate:
+                              certificate,
                             );
 
                             if (!mounted) return;
 
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(
                               SnackBar(
                                 content: Text(
                                   path == null
@@ -182,6 +244,7 @@ class _CertificateCenterScreenState
                             );
                           },
                         ),
+
                         const SizedBox(height: 16),
                       ],
                     ),

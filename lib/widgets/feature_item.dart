@@ -10,14 +10,14 @@ class FeatureItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: .05),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.amber, size: 30),
+          Icon(icon, color: Colors.amber, size: 18),
 
           const SizedBox(height: 10),
 
