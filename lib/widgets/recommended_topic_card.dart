@@ -8,16 +8,18 @@ class RecommendedTopicCard extends StatelessWidget {
   const RecommendedTopicCard({
     super.key,
     required this.topic,
+    required this.onReturn,
   });
 
   final Topic topic;
+  final Future<void> Function() onReturn;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(22),
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => TopicScreen(
@@ -27,6 +29,7 @@ class RecommendedTopicCard extends StatelessWidget {
             ),
           ),
         );
+        await onReturn();
       },
       child: Container(
         width: double.infinity,

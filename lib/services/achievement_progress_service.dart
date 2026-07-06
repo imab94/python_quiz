@@ -7,6 +7,7 @@ import 'package:python_quiz/services/streak_service.dart';
 import 'package:python_quiz/data/achievements.dart';
 import 'package:python_quiz/models/achievement.dart';
 import 'package:python_quiz/services/achievement_service.dart';
+import 'package:python_quiz/services/notification_service.dart';
 
 class AchievementProgressService {
   static Future<AchievementProgress> getProgress(String achievementId) async {
@@ -223,5 +224,35 @@ class AchievementProgressService {
     }
 
     return getProgress(achievement.id);
+  }
+
+  static Future<List<Achievement>> checkAndUnlockAchievements() async {
+    final List<Achievement> newlyUnlocked = [];
+
+    for (final achievement in allAchievements) {
+      final progress = await getProgress(achievement.id);
+
+      if (progress.current < progress.target) {
+        continue;
+      }
+
+      final unlocked =
+      await AchievementService.unlockAchievement(
+        achievement.id,
+      );
+
+      if (!unlocked) {
+        continue;
+      }
+
+      await NotificationService.addAchievementUnlockedNotification(
+        achievementId: achievement.id,
+        achievementName: achievement.title,
+      );
+
+      newlyUnlocked.add(achievement);
+    }
+
+    return newlyUnlocked;
   }
 }

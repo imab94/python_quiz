@@ -13,10 +13,10 @@ import 'package:python_quiz/widgets/favourite_button.dart';
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/completed_button.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
-import 'package:python_quiz/services/achievement_service.dart';
-import 'package:python_quiz/widgets/achievement_popup.dart';
-import 'package:python_quiz/data/achievements.dart';
 import 'package:python_quiz/services/xp_service.dart';
+
+import '../services/achievement_progress_service.dart';
+import '../widgets/achievement_popup.dart';
 
 class TopicScreen extends StatefulWidget {
   const TopicScreen({
@@ -192,22 +192,26 @@ class _TopicScreenState extends State<TopicScreen> {
                         },
                 ),
                 const SizedBox(height: 20),
-                const SizedBox(height: 20),
 
                 CompletedButton(
                   isCompleted: isCompleted,
                   onPressed: () async {
+                    // 1. Save topic completion.
                     await CompletedService.markCompleted(widget.topic.title);
-                    await XPService.addActivityXP(10);
-                    final unlocked =
-                    await AchievementService.unlockAchievement(
-                      "first_topic",
-                    );
 
-                    if (mounted && unlocked) {
-                      final achievement = allAchievements.firstWhere(
-                            (a) => a.id == "first_topic",
-                      );
+                    // 2. Add XP.
+                    await XPService.addActivityXP(10);
+
+                    // 3. Check ALL achievements AFTER saving progress.
+                    final newlyUnlocked =
+                    await AchievementProgressService
+                        .checkAndUnlockAchievements();
+
+                    if (!mounted) return;
+
+                    // 4. Show popup for newly unlocked achievements.
+                    for (final achievement in newlyUnlocked) {
+                      if (!mounted) return;
 
                       await showAchievementPopup(
                         context: context,
@@ -222,8 +226,12 @@ class _TopicScreenState extends State<TopicScreen> {
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("🎉 Topic marked as completed!"),
+                      SnackBar(
+                        content: Text(
+                          newlyUnlocked.isEmpty
+                              ? "🎉 Topic marked as completed!"
+                              : "🏆 ${newlyUnlocked.length} achievement unlocked!",
+                        ),
                       ),
                     );
                   },

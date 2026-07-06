@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/screens/certificate_center_screen.dart';
 import 'package:python_quiz/screens/learn_python_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
+
 import 'package:python_quiz/services/achievement_service.dart';
 import 'package:python_quiz/services/challenge_selection_screen.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
@@ -14,6 +15,7 @@ import 'package:python_quiz/widgets/search_topic_bar.dart';
 import 'package:python_quiz/widgets/search_topic_results.dart';
 import 'package:python_quiz/widgets/popular_topic_chip.dart';
 import 'package:python_quiz/widgets/course_stats_card.dart';
+
 import 'package:python_quiz/data/beginner/01_variables.dart';
 import 'package:python_quiz/data/beginner/03_loops.dart';
 import 'package:python_quiz/data/beginner/04_functions.dart';
@@ -26,6 +28,7 @@ import 'package:python_quiz/screens/favorites_screen.dart';
 import 'package:python_quiz/screens/completed_screen.dart';
 import 'package:python_quiz/widgets/dashboard_card.dart';
 import 'data/all_topics.dart';
+
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/widgets/continue_learning_card.dart';
 import 'package:python_quiz/screens/quiz_progress_screen.dart';
@@ -37,6 +40,10 @@ import 'package:python_quiz/models/topic.dart';
 import 'package:python_quiz/services/recommendation_service.dart';
 import 'package:python_quiz/widgets/recommended_topic_card.dart';
 import 'package:python_quiz/services/certificate_service.dart';
+
+import 'package:python_quiz/screens/notification_screen.dart';
+import 'package:python_quiz/services/notification_service.dart';
+import 'package:python_quiz/widgets/notifications/notification_bell_button.dart';
 
 
 class StartScreen extends StatefulWidget {
@@ -76,6 +83,8 @@ class _StartScreenState extends State<StartScreen> {
   Topic? recommendedTopic;
   bool _isCertificateVerified = false;
 
+  int _unreadNotificationCount = 0;
+
   bool get _shouldShowRecommendation {
     final recommendation = recommendedTopic;
     final continueTopicTitle = lastTopicTitle;
@@ -98,15 +107,19 @@ class _StartScreenState extends State<StartScreen> {
         recommendation.title.trim().toLowerCase();
   }
 
+  Future<void> _loadUnreadNotificationCount() async {
+    final count = await NotificationService.getUnreadCount();
+
+    if (!mounted) return;
+
+    setState(() {
+      _unreadNotificationCount = count;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    loadProgress();
-    loadLastTopic();
-    loadQuizProgress();
-    loadChallengeProgress();
-    loadStreak();
-    loadAchievements();
     refreshDashboard();
   }
 
@@ -172,22 +185,28 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   Future<void> refreshDashboard() async {
-      loadProgress();
-      loadLastTopic();
-      loadQuizProgress();
-      loadChallengeProgress();
-      loadStreak();
-      loadAchievements();
-    recommendedTopic =
-    await RecommendationService.getRecommendedTopic();
-      final certificateVerified =
-      await CertificateService.isEligible();
+    await Future.wait([
+      loadProgress(),
+      loadLastTopic(),
+      loadQuizProgress(),
+      loadChallengeProgress(),
+      loadStreak(),
+      loadAchievements(),
+      _loadUnreadNotificationCount(),
+    ]);
 
-    if (mounted) {
-      setState(() {
-        _isCertificateVerified = certificateVerified;
-      });
-    }
+    final recommendation =
+    await RecommendationService.getRecommendedTopic();
+
+    final certificateVerified =
+    await CertificateService.isEligible();
+
+    if (!mounted) return;
+
+    setState(() {
+      recommendedTopic = recommendation;
+      _isCertificateVerified = certificateVerified;
+    });
   }
 
   @override
@@ -205,39 +224,67 @@ class _StartScreenState extends State<StartScreen> {
           width: double.infinity,
           child: Column(
             children: [
-              /// Badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: .10),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: .15),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      Icons.auto_stories,
-                      size: 18,
-                      color: Colors.amber,
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    /// CENTER BADGE
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: .10),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: .15),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.auto_stories,
+                            size: 18,
+                            color: Colors.amber,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            "Python Learning Platform",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      "Python Learning Platform",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+
+                    /// TOP-RIGHT NOTIFICATION BELL
+                    Positioned(
+                      right: 0,
+                      child: NotificationBellButton(
+                        unreadCount: _unreadNotificationCount,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const NotificationScreen(),
+                            ),
+                          );
+
+                          await _loadUnreadNotificationCount();
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 45),
+
+              const SizedBox(height: 35),
               /// Logo with Glow
               Stack(
                 alignment: Alignment.center,
@@ -281,12 +328,12 @@ class _StartScreenState extends State<StartScreen> {
                 ContinueLearningCard(
                   title: lastTopicTitle!,
                   level: lastTopicLevel!,
-                  onTap: () {
+                  onTap: () async {
                     final topic = allTopics.firstWhere(
                           (t) => t.title == lastTopicTitle,
                     );
 
-                    Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => TopicScreen(
@@ -295,10 +342,10 @@ class _StartScreenState extends State<StartScreen> {
                           currentIndex: allTopics.indexOf(topic),
                         ),
                       ),
-                    ).then((_) {
-                      loadProgress();
-                      loadLastTopic();
-                    });
+                    );
+
+                    await refreshDashboard();
+                    await _loadUnreadNotificationCount();
                   },
                 ),
                 const SizedBox(height: 22),
@@ -356,8 +403,11 @@ class _StartScreenState extends State<StartScreen> {
                 const SizedBox(height: 18),
                 RecommendedTopicCard(
                   topic: recommendedTopic!,
+                  onReturn: refreshDashboard,
                 ),
               ],
+
+              const SizedBox(height: 18),
 
               Text(
                 "Python Learning Path",
@@ -469,6 +519,7 @@ class _StartScreenState extends State<StartScreen> {
                         );
 
                         await refreshDashboard();
+                        await _loadUnreadNotificationCount();
                       },
                     );
                   },
