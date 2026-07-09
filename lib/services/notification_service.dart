@@ -216,4 +216,101 @@ class NotificationService {
       ),
     );
   }
+
+  static Future<void> addTopicCompletedNotification({
+    required String topicTitle,
+  }) async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.topicCompleted,
+        title: "📘 Topic Completed",
+        message: "You successfully completed $topicTitle.",
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+  }
+
+  static Future<void> addQuizPassedNotification({
+    required String topicTitle,
+    required int score,
+    required int totalQuestions,
+  }) async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.quizPassed,
+        title: "📝 Quiz Passed",
+        message: "You passed the $topicTitle quiz ($score/$totalQuestions).",
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+  }
+
+  static Future<void> addRandomChallengePassedNotification({
+    required String difficulty,
+    required int score,
+    required int totalQuestions,
+  }) async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.randomChallenge,
+        title: "🎯 Challenge Passed",
+        message:
+        "You passed the ${difficulty.toUpperCase()} Challenge ($score/$totalQuestions).",
+        createdAt: DateTime.now(),
+
+        isRead: false,
+      ),
+    );
+  }
+
+  static Future<void> addStreakMilestoneNotification({
+    required int streak,
+  }) async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.streakMilestone,
+        title: "🔥 $streak-Day Streak!",
+        message: "Amazing! You've learned for $streak consecutive days.",
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+  }
+
+  static Future<void> addCertificateUnlockedNotification({
+    required String certificateName,
+  }) async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.certificateUnlocked,
+        title: "🎓 Certificate Unlocked!",
+        message:
+        "Congratulations! Your $certificateName Certificate is now available.",
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+  }
+
+  static Future<void> addCourseCompletedNotification() async {
+    await addNotification(
+      AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: AppNotificationType.courseCompleted,
+        title: "🎉 Course Completed!",
+        message:
+        "Congratulations! You've completed the Python Learning Path.",
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
+  }
+
 }

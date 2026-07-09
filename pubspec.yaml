@@ -43,6 +43,10 @@ dependencies:
   path_provider: ^2.1.5
   gal: ^2.3.1
   permission_handler: ^11.3.1
+  confetti: ^0.8.0
+  uuid: ^4.5.1
+  image_picker: ^1.2.0
+  country_picker: ^2.0.27
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +87,7 @@ flutter:
     - assets/images/img_1.png
     - assets/images/python-logo.png
     - assets/images/director_signature.png
+    - assets/images/python_director.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -194,6 +194,18 @@ class NotificationCard extends StatelessWidget {
         color: Colors.lightBlueAccent,
       ),
 
+      AppNotificationType.randomChallenge =>
+      const _NotificationVisual(
+        icon: Icons.emoji_events_rounded,
+        color: Colors.orangeAccent,
+      ),
+
+      AppNotificationType.courseCompleted =>
+      const _NotificationVisual(
+        icon: Icons.celebration_rounded,
+        color: Colors.deepPurpleAccent,
+      ),
+
       AppNotificationType.perfectScore =>
       const _NotificationVisual(
         icon: Icons.workspace_premium_rounded,

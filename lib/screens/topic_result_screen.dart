@@ -9,6 +9,8 @@ import 'package:python_quiz/screens/quiz_report_screen.dart';
 import 'package:python_quiz/widgets/achievement_popup.dart';
 import 'package:python_quiz/data/achievements.dart';
 import 'package:python_quiz/services/achievement_manager.dart';
+import 'package:python_quiz/services/notification_service.dart';
+import 'package:python_quiz/services/quiz_notification_service.dart';
 
 class TopicResultScreen extends StatefulWidget {
   const TopicResultScreen({
@@ -61,6 +63,26 @@ class _TopicResultScreenState extends State<TopicResultScreen> {
       totalQuestions: widget.topic.quizQuestions.length,
       selectedAnswers: widget.selectedAnswers,
     );
+
+    // Add notification only if the quiz is passed
+    final passed =
+        correctAnswers >=
+            (widget.topic.quizQuestions.length * 0.6).ceil();
+
+    if (passed) {
+      final shouldNotify =
+      await QuizNotificationService.shouldNotify(
+        widget.topic.title,
+      );
+
+      if (shouldNotify) {
+        await NotificationService.addQuizPassedNotification(
+          topicTitle: widget.topic.title,
+          score: correctAnswers,
+          totalQuestions: widget.topic.quizQuestions.length,
+        );
+      }
+    }
 
     await AchievementManager.onTopicQuizCompleted(
       context: context,

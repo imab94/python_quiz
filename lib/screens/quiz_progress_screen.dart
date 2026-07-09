@@ -73,17 +73,12 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                   itemCount: allTopics.length,
                   itemBuilder: (context, index) {
                     final topic = allTopics[index];
-
                     final result =
                     quizResults[topic.title];
-
                     final attempted =
                         result != null;
-
                     String status;
-
                     Color color;
-
                     if (!attempted) {
                       status = "Not Attempted";
                       color = Colors.orangeAccent;
@@ -94,7 +89,6 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                       status = "Failed";
                       color = Colors.redAccent;
                     }
-
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -138,13 +132,17 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                         },
                         // RIGHT BUTTON
                         secondaryActionText: attempted
-                            ? (result["passed"]
+                            ? (result["score"] == result["totalQuestions"]
+                            ? "Mastered ✓"
+                            : result["passed"]
                             ? "Improve Score"
                             : "Retry Quiz")
                             : null,
 
                         onSecondaryTap: attempted
-                            ? () {
+                            ? (result["score"] == result["totalQuestions"]
+                            ? () {} // Do nothing
+                            : () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -155,7 +153,7 @@ class _QuizProgressScreenState extends State<QuizProgressScreen> {
                           ).then((_) {
                             loadQuizResults();
                           });
-                        }
+                        })
                             : null,
                       ),
                     );

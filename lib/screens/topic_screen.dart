@@ -16,6 +16,7 @@ import 'package:python_quiz/services/continue_reading_service.dart';
 import 'package:python_quiz/services/xp_service.dart';
 
 import '../services/achievement_progress_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/achievement_popup.dart';
 
 class TopicScreen extends StatefulWidget {
@@ -198,6 +199,10 @@ class _TopicScreenState extends State<TopicScreen> {
                   onPressed: () async {
                     // 1. Save topic completion.
                     await CompletedService.markCompleted(widget.topic.title);
+
+                    await NotificationService.addTopicCompletedNotification(
+                      topicTitle: widget.topic.title,
+                    );
 
                     // 2. Add XP.
                     await XPService.addActivityXP(10);

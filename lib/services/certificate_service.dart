@@ -5,6 +5,7 @@ import 'package:python_quiz/data/topics.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/services/completed_service.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
+import 'package:python_quiz/services/profile_service.dart';
 
 class CertificateService {
 
@@ -56,6 +57,7 @@ class CertificateService {
     return CertificateLevel.bronze;
   }
 
+
   static Future<double> getAverageScore() async {
     return QuizProgressService.getAveragePercentage();
   }
@@ -97,8 +99,10 @@ class CertificateService {
     await getCertificateLevel();
     final certificateId = await generateCertificateId();
 
+    final profile = await ProfileService.getProfile();
+
     return Certificate(
-      learnerName: learnerName,
+      learnerName: profile?.name ?? learnerName,
       courseName: "Python Learning Path",
       level: level,
       topicsCompleted: completedTopics.length,
@@ -111,8 +115,8 @@ class CertificateService {
       certificateId: certificateId,
       verificationUrl:
       "https://pythonlearningplatform.com/verify/$certificateId",
-      directorName: "Arun Bhardwaj",
-      directorTitle: "Founder • Python Learning Platform",
+      directorName: "Python Learning Platform",
+      directorTitle: "Certification Authority",
       isVerified: eligible,
       isPreview: !eligible,
       organizationName: "Python Master"

@@ -9,6 +9,9 @@ import 'package:python_quiz/screens/challenge_quiz_screen.dart';
 import 'package:python_quiz/services/challenge_progress_service.dart';
 import 'package:python_quiz/services/achievement_manager.dart';
 import 'package:python_quiz/services/streak_service.dart';
+import 'package:python_quiz/services/notification_service.dart';
+
+import '../services/random_challenge_notification_service.dart';
 
 class UniversalQuizResultScreen extends StatefulWidget {
   const UniversalQuizResultScreen({
@@ -49,6 +52,21 @@ class _UniversalQuizResultScreenState extends State<UniversalQuizResultScreen> {
       passed: isPassed,
       difficulty: widget.challengeLevel!.name,
     );
+
+    if (isPassed) {
+      final shouldNotify =
+      await RandomChallengeNotificationService.shouldNotify(
+        widget.challengeLevel!.name,
+      );
+
+      if (shouldNotify) {
+        await NotificationService.addRandomChallengePassedNotification(
+          difficulty: widget.challengeLevel!.name,
+          score: correctAnswers,
+          totalQuestions: widget.questions.length,
+        );
+      }
+    }
 
     // Update Daily Streak
     await StreakService.updateStreak();

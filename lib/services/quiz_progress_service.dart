@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'certificate_service.dart';
+
 class QuizProgressService {
   static const String _key = "quiz_progress";
 
@@ -111,8 +113,10 @@ class QuizProgressService {
       total += (quiz["percentage"] as num).toDouble();
     }
 
-    return total / quizzes.length;
+    // Divide by TOTAL topics instead of attempted quizzes
+    return total / CertificateService.totalTopics;
   }
+
 
   static Future<bool> areAllQuizzesPassed(
       int totalTopics,

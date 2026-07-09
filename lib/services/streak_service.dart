@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'notification_service.dart';
+
 class StreakService {
   static const _currentStreakKey = "current_streak";
   static const _bestStreakKey = "best_streak";
@@ -51,6 +53,14 @@ class StreakService {
     await prefs.setInt(_currentStreakKey, currentStreak);
     await prefs.setInt(_bestStreakKey, bestStreak);
     await prefs.setString(_lastStudyDateKey, todayDate.toIso8601String());
+
+    if (currentStreak == 3 ||
+        currentStreak == 7 ||
+        currentStreak == 30) {
+      await NotificationService.addStreakMilestoneNotification(
+        streak: currentStreak,
+      );
+    }
   }
 
   static Future<int> getCurrentStreak() async {

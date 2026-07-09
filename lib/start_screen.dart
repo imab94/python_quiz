@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/screens/certificate_center_screen.dart';
+import 'package:python_quiz/screens/course_completion_screen.dart';
 import 'package:python_quiz/screens/learn_python_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
 
 import 'package:python_quiz/services/achievement_service.dart';
-import 'package:python_quiz/services/challenge_selection_screen.dart';
+import 'package:python_quiz/screens/challenge_selection_screen.dart';
 import 'package:python_quiz/services/continue_reading_service.dart';
+import 'package:python_quiz/services/course_completion_service.dart';
 import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/widgets/achievement_dashboard_card.dart';
 import 'package:python_quiz/widgets/certificate_home_card.dart';
@@ -44,7 +46,11 @@ import 'package:python_quiz/services/certificate_service.dart';
 import 'package:python_quiz/screens/notification_screen.dart';
 import 'package:python_quiz/services/notification_service.dart';
 import 'package:python_quiz/widgets/notifications/notification_bell_button.dart';
-
+import 'package:python_quiz/screens/profile_setup_screen.dart';
+import 'package:python_quiz/services/profile_service.dart';
+import 'package:python_quiz/widgets/drawer/profile_drawer.dart';
+import 'package:python_quiz/models/user_profile.dart';
+import 'package:python_quiz/screens/settings_screen.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -85,6 +91,8 @@ class _StartScreenState extends State<StartScreen> {
 
   int _unreadNotificationCount = 0;
 
+  UserProfile? _profile;
+
   bool get _shouldShowRecommendation {
     final recommendation = recommendedTopic;
     final continueTopicTitle = lastTopicTitle;
@@ -117,10 +125,21 @@ class _StartScreenState extends State<StartScreen> {
     });
   }
 
+  Future<void> _loadProfile() async {
+    final profile = await ProfileService.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      _profile = profile;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     refreshDashboard();
+    _loadProfile();
   }
 
   Future<void> loadProgress() async {
@@ -184,6 +203,62 @@ class _StartScreenState extends State<StartScreen> {
     setState(() {});
   }
 
+  Future<void> _checkCourseCompletion() async {
+    final eligible = await CertificateService.isEligible();
+
+    if (!eligible || !mounted) {
+      return;
+    }
+
+    final level = await CertificateService.getCertificateLevel();
+
+    // First ever course completion
+    final shouldCelebrate =
+    await CourseCompletionService.shouldShowCelebration();
+
+    if (shouldCelebrate) {
+      // Remember which certificate the user had
+      await CourseCompletionService.saveHighestCertificateLevel(
+        level.name,
+      );
+
+      // Permanent notification
+      await NotificationService.addCourseCompletedNotification();
+
+      if (!mounted) return;
+
+      final average =
+      await CertificateService.getAverageScore();
+
+      final topicsCompleted =
+      await CompletedService.getCompletedCount();
+
+      final quizzesPassed =
+      await QuizProgressService.getPassedQuizCount();
+
+      final learnerName = await ProfileService.getLearnerName();
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CourseCompletionScreen(
+            learnerName: learnerName,
+            topicsCompleted: topicsCompleted,
+            totalTopics: CertificateService.totalTopics,
+            quizzesPassed: quizzesPassed,
+            averageScore: average,
+            certificateName:
+            "${level.name[0].toUpperCase()}${level.name.substring(1)}",
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    // We'll handle Bronze -> Silver -> Gold upgrades here later.
+  }
+
   Future<void> refreshDashboard() async {
     await Future.wait([
       loadProgress(),
@@ -201,450 +276,543 @@ class _StartScreenState extends State<StartScreen> {
     final certificateVerified =
     await CertificateService.isEligible();
 
+
     if (!mounted) return;
 
     setState(() {
       recommendedTopic = recommendation;
       _isCertificateVerified = certificateVerified;
     });
+    await _checkCourseCompletion();
+  }
+
+  Future<void> _openSettings() async {
+
+    Navigator.pop(context);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const SettingsScreen(),
+      ),
+    );
+
+  }
+
+  Future<void> _openProfileSetup() async {
+    Navigator.pop(context);
+
+    final updated = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProfileSetupScreen(
+          profile: _profile,
+        ),
+      ),
+    );
+
+    if (updated == true) {
+      await _loadProfile();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+
     final int totalQuizQuestions = allTopics.fold(0,
           (sum, topic) => sum + topic.quizQuestions.length,
     );
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 22,
-          vertical: 24,
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    /// CENTER BADGE
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .10),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: .15),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.auto_stories,
-                            size: 18,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            "Python Learning Platform",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
-                    /// TOP-RIGHT NOTIFICATION BELL
-                    Positioned(
-                      right: 0,
-                      child: NotificationBellButton(
-                        unreadCount: _unreadNotificationCount,
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const NotificationScreen(),
-                            ),
-                          );
+    return Scaffold(
+      drawer: ProfileDrawer(
+        profile: _profile,
 
-                          await _loadUnreadNotificationCount();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+        onEditProfile: _openProfileSetup,
 
-              const SizedBox(height: 35),
-              /// Logo with Glow
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 240,
-                    height: 240,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: .03),
-                    ),
-                  ),
-                  Container(
-                    width: 190,
-                    height: 190,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: .12),
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.deepPurpleAccent.withValues(alpha: .30),
-                          blurRadius: 40,
-                          spreadRadius: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Image.asset(
-                    'assets/images/img_1.png',
-                    width: 135,
-                    color: const Color(0xFFB89BFF),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
+        onSettings: _openSettings,
 
-              if (lastTopicTitle != null) ...[
-                ContinueLearningCard(
-                  title: lastTopicTitle!,
-                  level: lastTopicLevel!,
-                  onTap: () async {
-                    final topic = allTopics.firstWhere(
-                          (t) => t.title == lastTopicTitle,
-                    );
+        onRateApp: () {},
 
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TopicScreen(
-                          topic: topic,
-                          topicList: allTopics,
-                          currentIndex: allTopics.indexOf(topic),
-                        ),
-                      ),
-                    );
+        onFeedback: () {},
 
-                    await refreshDashboard();
-                    await _loadUnreadNotificationCount();
-                  },
-                ),
-                const SizedBox(height: 22),
-                Container(
+        onShareApp: () {},
+
+        onAbout: () {},
+      ),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 22,
+            vertical: 24,
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                SizedBox(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: Colors.orangeAccent.withValues(alpha: .4),
-                    ),
-                  ),
-                  child: Row(
+                  height: 52,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      const Icon(
-                        Icons.local_fire_department,
-                        color: Colors.orangeAccent,
-                        size: 42,
-                      ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Text(
-                              "$currentStreak Day Streak",
-                              style: GoogleFonts.lato(
+                      //Hamburger Button
+                      Positioned(
+                        left: 0,
+                        child: Builder(
+                          builder: (context) {
+                            return IconButton(
+                              tooltip: "Menu",
+                              splashRadius: 24,
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                              icon: const Icon(
+                                Icons.menu_rounded,
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
+                                size: 30,
                               ),
+                            );
+                          },
+                        ),
+                      ),
+      
+                      /// CENTER BADGE
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: .10),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: .15),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.auto_stories,
+                              size: 18,
+                              color: Colors.amber,
                             ),
-
-                            const SizedBox(height: 4),
-
+                            SizedBox(width: 8),
                             Text(
-                              "Best Streak: $bestStreak Days",
-                              style: GoogleFonts.lato(
-                                color: Colors.white70,
-                                fontSize: 16,
+                              "Python Learning Platform",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
                       ),
+      
+                      /// TOP-RIGHT NOTIFICATION BELL
+                      Positioned(
+                        right: 0,
+                        child: NotificationBellButton(
+                          unreadCount: _unreadNotificationCount,
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const NotificationScreen(),
+                              ),
+                            );
+      
+                            await _loadUnreadNotificationCount();
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-              ],
-
-              if (_shouldShowRecommendation) ...[
-                const SizedBox(height: 18),
-                RecommendedTopicCard(
-                  topic: recommendedTopic!,
-                  onReturn: refreshDashboard,
-                ),
-              ],
-
-              const SizedBox(height: 18),
-
-              Text(
-                "Python Learning Path",
-                style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              Text(
-                "Master Python from Beginner to Advanced",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                  color: Colors.white70,
-                  fontSize: 12,
-                  height: 1.5,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              /// ================================
-              /// SEARCH TOPICS
-              /// ================================
-              SearchTopicBar(
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-
-              /// Only add spacing/results when searching.
-              if (searchQuery.isNotEmpty) ...[
-                const SizedBox(height: 12),
-
-                SearchTopicResults(
-                  query: searchQuery,
-                  topics: allTopics,
-                ),
-              ],
-
-              const SizedBox(height: 18),
-
-              /// ================================
-              /// COURSE STATS
-              /// Topics • Questions • Levels • Hours
-              /// ================================
-              const CourseStatsCard(),
-
-              const SizedBox(height: 18),
-
-              /// ================================
-              /// LEARN PYTHON CARD
-              /// ================================
-              HomeCard(
-                title: "Learn Python",
-                // Keep this simple because CourseStatsCard
-                // already shows Topics, Questions, Levels and Hours.
-                subtitle: "Beginner → Advanced",
-                icon: Icons.menu_book_rounded,
-                iconColor: Colors.amber,
-                progress: completionPercentage,
-                progressText:
-                "$completedCount / ${allTopics.length} "
-                    "Topics Completed "
-                    "(${(completionPercentage * 100).round()}%)",
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LearnPythonScreen(),
+      
+                const SizedBox(height: 35),
+                /// Logo with Glow
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 240,
+                      height: 240,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: .03),
+                      ),
                     ),
-                  );
-                  await refreshDashboard();
-                },
-              ),
-              const SizedBox(height: 18),
-
-              Text(
-                "Popular Topics",
-                style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                height: 48,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: StartScreen.popularTopics.length,
-                  itemBuilder: (context, index) {
-                    final topic = StartScreen.popularTopics[index];
-                    return PopularTopicChip(
-                      topic: topic,
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => TopicScreen(
-                              topic: topic,
-                              topicList: StartScreen.popularTopics,
-                              currentIndex: index,
-                            ),
+                    Container(
+                      width: 190,
+                      height: 190,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: .12),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.deepPurpleAccent.withValues(alpha: .30),
+                            blurRadius: 40,
+                            spreadRadius: 8,
                           ),
-                        );
-
-                        await refreshDashboard();
-                        await _loadUnreadNotificationCount();
-                      },
-                    );
-                  },
+                        ],
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/images/img_1.png',
+                      width: 135,
+                      color: const Color(0xFFB89BFF),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 18),
-              /// ================================
-              /// RANDOM CHALLENGE
-              /// ================================
-              HomeCard(
-                title: "Random Challenge",
-                subtitle:
-                "$totalQuizQuestions+ Random Questions"
-                    "\n🏆 $passedChallenges Passed • $failedChallenges Failed",
-                icon: Icons.quiz_rounded,
-                iconColor: Colors.lightBlueAccent,
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ChallengeSelectionScreen(),
-                    ),
-                  );
-
-                  await refreshDashboard();
-                  await loadQuizProgress();
-                  await loadChallengeProgress();
-                },
-              ),
-
-              const SizedBox(height: 18),
-
-              HomeCard(
-                title: "Quiz Progress",
-                subtitle: "Track your performance",
-                progress: completedQuizCount / allTopics.length,
-                progressText:
-                "$completedQuizCount / ${allTopics.length} Quizzes Completed",
-                icon: Icons.analytics_rounded,
-                iconColor: Colors.lightGreenAccent,
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const QuizProgressScreen(),
-                    ),
-                  );
-
-                  await refreshDashboard();
-                },
-              ),
-              const SizedBox(height: 18),
-              CertificateHomeCard(
-                completedTopics: completedCount,
-                totalTopics: allTopics.length,
-                isVerified: _isCertificateVerified,
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CertificateCenterScreen(),
-                    ),
-                  );
-
-                  await refreshDashboard();
-                },
-              ),
-
-              const SizedBox(height: 18),
-
-              AchievementDashboardCard(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AchievementScreen(),
-                    ),
-                  );
-
-                  await refreshDashboard();
-                },
-              ),
-
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: DashboardCard(
-                      title: "Favourites",
-                      subtitle: "Saved Topics",
-                      icon: Icons.favorite,
-                      iconColor: Colors.redAccent,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const FavoritesScreen(),
+                const SizedBox(height: 40),
+      
+                if (lastTopicTitle != null) ...[
+                  ContinueLearningCard(
+                    title: lastTopicTitle!,
+                    level: lastTopicLevel!,
+                    onTap: () async {
+                      final topic = allTopics.firstWhere(
+                            (t) => t.title == lastTopicTitle,
+                      );
+      
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TopicScreen(
+                            topic: topic,
+                            topicList: allTopics,
+                            currentIndex: allTopics.indexOf(topic),
                           ),
-                        );
-                      },
+                        ),
+                      );
+      
+                      await refreshDashboard();
+                      await _loadUnreadNotificationCount();
+                    },
+                  ),
+                  const SizedBox(height: 22),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: .12),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: Colors.orangeAccent.withValues(alpha: .4),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.local_fire_department,
+                          color: Colors.orangeAccent,
+                          size: 42,
+                        ),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+      
+                              Text(
+                                "$currentStreak Day Streak",
+                                style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24,
+                                ),
+                              ),
+      
+                              const SizedBox(height: 4),
+      
+                              Text(
+                                "Best Streak: $bestStreak Days",
+                                style: GoogleFonts.lato(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: DashboardCard(
-                      title: "Completed",
-                      subtitle: "Finished Topics",
-                      icon: Icons.check_circle,
-                      iconColor: Colors.greenAccent,
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CompletedScreen(),
-                          ),
-                        );
-                        await refreshDashboard();
-                      },
-                    ),
+                  const SizedBox(height: 24),
+                ],
+      
+                if (_shouldShowRecommendation) ...[
+                  const SizedBox(height: 18),
+                  RecommendedTopicCard(
+                    topic: recommendedTopic!,
+                    onReturn: refreshDashboard,
                   ),
                 ],
-              ),
-
-              //const WhyPythonCard(),
-            ],
+      
+                const SizedBox(height: 18),
+      
+                Text(
+                  "Python Learning Path",
+                  style: GoogleFonts.lato(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+      
+                Text(
+                  "Master Python from Beginner to Advanced",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lato(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
+                ),
+      
+                const SizedBox(height: 18),
+      
+                /// ================================
+                /// SEARCH TOPICS
+                /// ================================
+                SearchTopicBar(
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                ),
+      
+                /// Only add spacing/results when searching.
+                if (searchQuery.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+      
+                  SearchTopicResults(
+                    query: searchQuery,
+                    topics: allTopics,
+                  ),
+                ],
+      
+                const SizedBox(height: 18),
+      
+                /// ================================
+                /// COURSE STATS
+                /// Topics • Questions • Levels • Hours
+                /// ================================
+                const CourseStatsCard(),
+      
+                const SizedBox(height: 18),
+      
+                /// ================================
+                /// LEARN PYTHON CARD
+                /// ================================
+                HomeCard(
+                  title: "Learn Python",
+                  // Keep this simple because CourseStatsCard
+                  // already shows Topics, Questions, Levels and Hours.
+                  subtitle: "Beginner → Advanced",
+                  icon: Icons.menu_book_rounded,
+                  iconColor: Colors.amber,
+                  progress: completionPercentage,
+                  progressText:
+                  "$completedCount / ${allTopics.length} "
+                      "Topics Completed "
+                      "(${(completionPercentage * 100).round()}%)",
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LearnPythonScreen(),
+                      ),
+                    );
+                    await refreshDashboard();
+                  },
+                ),
+                const SizedBox(height: 18),
+      
+                Text(
+                  "Popular Topics",
+                  style: GoogleFonts.lato(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  height: 48,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: StartScreen.popularTopics.length,
+                    itemBuilder: (context, index) {
+                      final topic = StartScreen.popularTopics[index];
+                      return PopularTopicChip(
+                        topic: topic,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TopicScreen(
+                                topic: topic,
+                                topicList: StartScreen.popularTopics,
+                                currentIndex: index,
+                              ),
+                            ),
+                          );
+      
+                          await refreshDashboard();
+                          await _loadUnreadNotificationCount();
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 18),
+                /// ================================
+                /// RANDOM CHALLENGE
+                /// ================================
+                HomeCard(
+                  title: "Random Challenge",
+                  subtitle:
+                  "$totalQuizQuestions+ Random Questions"
+                      "\n🏆 $passedChallenges Passed • $failedChallenges Failed",
+                  icon: Icons.quiz_rounded,
+                  iconColor: Colors.lightBlueAccent,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ChallengeSelectionScreen(),
+                      ),
+                    );
+      
+                    await refreshDashboard();
+                  },
+                ),
+      
+                const SizedBox(height: 18),
+      
+                HomeCard(
+                  title: "Quiz Progress",
+                  subtitle: "Track your performance",
+                  progress: completedQuizCount / allTopics.length,
+                  progressText:
+                  "$completedQuizCount / ${allTopics.length} Quizzes Completed",
+                  icon: Icons.analytics_rounded,
+                  iconColor: Colors.lightGreenAccent,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const QuizProgressScreen(),
+                      ),
+                    );
+      
+                    await refreshDashboard();
+                  },
+                ),
+                const SizedBox(height: 18),
+                CertificateHomeCard(
+                  completedTopics: completedCount,
+                  totalTopics: allTopics.length,
+                  isVerified: _isCertificateVerified,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CertificateCenterScreen(),
+                      ),
+                    );
+      
+                    await refreshDashboard();
+                  },
+                ),
+      
+                const SizedBox(height: 18),
+      
+                AchievementDashboardCard(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AchievementScreen(),
+                      ),
+                    );
+      
+                    await refreshDashboard();
+                  },
+                ),
+      
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DashboardCard(
+                        title: "Favourites",
+                        subtitle: "Saved Topics",
+                        icon: Icons.favorite,
+                        iconColor: Colors.redAccent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FavoritesScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: DashboardCard(
+                        title: "Completed",
+                        subtitle: "Finished Topics",
+                        icon: Icons.check_circle,
+                        iconColor: Colors.greenAccent,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CompletedScreen(),
+                            ),
+                          );
+                          await refreshDashboard();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+      
+                //const WhyPythonCard(),
+                const SizedBox(height: 25,),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileSetupScreen(),
+                        ),
+                      );
+      
+                      debugPrint("Profile Result: $result");
+                    },
+                    icon: const Icon(Icons.person_outline),
+                    label: const Text(
+                      "🧪 Test Profile Setup",
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
+            ),
           ),
         ),
       ),

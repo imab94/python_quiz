@@ -1,39 +1,38 @@
 enum AppNotificationType {
-  achievementUnlocked,
-  topicCompleted,
-  quizPassed,
-  perfectScore,
-  certificateUnlocked,
-  streakMilestone,
+    achievementUnlocked,
+    topicCompleted,
+    quizPassed,
+    perfectScore,
+    certificateUnlocked,
+    streakMilestone,
+    randomChallenge,
+    courseCompleted,
 }
 
 class AppNotification {
-  const AppNotification({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.createdAt,
-    this.isRead = false,
+    const AppNotification({
+      required this.id,
+      required this.type,
+      required this.title,
+      required this.message,
+      required this.createdAt,
+      this.isRead = false,
   });
 
-  final String id;
-  final AppNotificationType type;
-
-  final String title;
-  final String message;
-
-  final DateTime createdAt;
-
-  final bool isRead;
+    final String id;
+    final AppNotificationType type;
+    final String title;
+    final String message;
+    final DateTime createdAt;
+    final bool isRead;
 
   AppNotification copyWith({
-    String? id,
-    AppNotificationType? type,
-    String? title,
-    String? message,
-    DateTime? createdAt,
-    bool? isRead,
+      String? id,
+      AppNotificationType? type,
+      String? title,
+      String? message,
+      DateTime? createdAt,
+      bool? isRead,
   }) {
     return AppNotification(
       id: id ?? this.id,

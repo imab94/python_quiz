@@ -7,8 +7,43 @@ import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/services/xp_service.dart';
 import 'package:python_quiz/services/streak_service.dart';
 import 'package:python_quiz/services/question_progress_service.dart';
+import 'package:python_quiz/data/achievements.dart';
+
+import 'notification_service.dart';
 
 class AchievementManager {
+
+  static Future<void> _unlockAchievement({
+    required BuildContext context,
+    required String achievementId,
+  }) async {
+    final unlocked =
+    await AchievementService.unlockAchievement(
+      achievementId,
+    );
+
+    if (!unlocked) return;
+
+    final achievement = allAchievements.where(
+          (a) => a.id == achievementId,
+    ).firstOrNull;
+
+    if (achievement == null) {
+      return;
+    }
+
+    await NotificationService
+        .addAchievementUnlockedNotification(
+      achievementId: achievement.id,
+      achievementName: achievement.title,
+    );
+
+    await AchievementPopupService.show(
+      context,
+      achievementId,
+    );
+  }
+
   // ============================================================
   // TOPIC QUIZ ACHIEVEMENTS
   // ============================================================
@@ -58,11 +93,10 @@ class AchievementManager {
     // =========================
 
     if (completedQuizzes >= 1) {
-      final unlocked = await AchievementService.unlockAchievement("first_quiz");
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "first_quiz");
-      }
+      await _unlockAchievement(
+        context: context,
+        achievementId: "first_quiz",
+      );
     }
 
     // =========================
@@ -70,13 +104,10 @@ class AchievementManager {
     // =========================
 
     if (completedQuizzes >= 10) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "ten_quizzes",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "ten_quizzes",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "ten_quizzes");
-      }
     }
 
     // =========================
@@ -84,13 +115,11 @@ class AchievementManager {
     // =========================
 
     if (score == totalQuestions) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "perfect_score",
-      );
+      await _unlockAchievement(
+        context: context,
+        achievementId: "perfect_score",
 
-      if (unlocked) {
-        await AchievementPopupService.show(context, "perfect_score");
-      }
+      );
     }
 
     // =========================
@@ -98,32 +127,18 @@ class AchievementManager {
     // =========================
     // 100 Questions
     if (totalQuestionsAnswered >= 100) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "hundred_questions",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "hundred_questions",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "hundred_questions",
-        );
-      }
     }
 
   // 1000 Questions
     if (totalQuestionsAnswered >= 1000) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "thousand_questions",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "thousand_questions",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "thousand_questions",
-        );
-      }
     }
   }
 
@@ -184,41 +199,30 @@ class AchievementManager {
     // =========================
     // First Random Challenge
     // =========================
-
     if (completedChallenges >= 1) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "first_random",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "first_random",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "first_random");
-      }
     }
-
     // =========================
     // 5 Challenges
     // =========================
-
     if (completedChallenges >= 5) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "five_random",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "five_random",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "five_random");
-      }
     }
-
     // =========================
     // 10 Challenges
     // =========================
 
     if (completedChallenges >= 10) {
-      final unlocked = await AchievementService.unlockAchievement("ten_random");
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "ten_random");
-      }
+      await _unlockAchievement(
+        context: context,
+        achievementId: "ten_random",
+      );
     }
 
     // =========================
@@ -226,13 +230,10 @@ class AchievementManager {
     // =========================
 
     if (completedChallenges >= 25) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "twentyfive_random",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "twentyfive_random",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "twentyfive_random");
-      }
     }
 
     // =========================
@@ -240,13 +241,10 @@ class AchievementManager {
     // =========================
 
     if (completedChallenges >= 50) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "fifty_random",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "fifty_random",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "fifty_random");
-      }
     }
 
     // =========================
@@ -254,43 +252,31 @@ class AchievementManager {
     // =========================
 
     if (difficulty == "beginner") {
-      final unlocked = await AchievementService.unlockAchievement(
-        "beginner_challenger",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "beginner_challenger",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "beginner_challenger");
-      }
     }
 
     if (difficulty == "intermediate") {
-      final unlocked = await AchievementService.unlockAchievement(
-        "intermediate_challenger",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "intermediate_challenger",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "intermediate_challenger");
-      }
     }
 
     if (difficulty == "advanced") {
-      final unlocked = await AchievementService.unlockAchievement(
-        "advanced_challenger",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "advanced_challenger",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "advanced_challenger");
-      }
     }
 
     if (difficulty == "mixed") {
-      final unlocked = await AchievementService.unlockAchievement(
-        "mixed_master",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "mixed_master",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "mixed_master");
-      }
     }
 
     // =========================
@@ -299,32 +285,18 @@ class AchievementManager {
 
     // 100 Questions
     if (totalQuestionsAnswered >= 100) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "hundred_questions",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "hundred_questions",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "hundred_questions",
-        );
-      }
     }
 
 // 1000 Questions
     if (totalQuestionsAnswered >= 1000) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "thousand_questions",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "thousand_questions",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "thousand_questions",
-        );
-      }
     }
 
     // =========================
@@ -333,47 +305,26 @@ class AchievementManager {
 
 // Daily Learner
     if (challengeDays >= 1) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "daily_challenge",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "daily_challenge",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "daily_challenge",
-        );
-      }
     }
 
 // Weekly Challenger
     if (challengeDays >= 7) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "weekly_challenge",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "weekly_challenge",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "weekly_challenge",
-        );
-      }
     }
 
   // Monthly Master
     if (challengeDays >= 30) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "monthly_challenge",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "monthly_challenge",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "monthly_challenge",
-        );
-      }
     }
 
     // =========================
@@ -381,11 +332,10 @@ class AchievementManager {
     // =========================
 
     if (passedChallenges >= 1) {
-      final unlocked = await AchievementService.unlockAchievement("first_pass");
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "first_pass");
-      }
+      await _unlockAchievement(
+        context: context,
+        achievementId: "first_pass",
+      );
     }
 
     // =========================
@@ -393,13 +343,10 @@ class AchievementManager {
     // =========================
 
     if (winStreak >= 3) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "three_passes",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "three_passes",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "three_passes");
-      }
     }
 
     // =========================
@@ -407,13 +354,10 @@ class AchievementManager {
     // =========================
 
     if (score == totalQuestions) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "perfect_random",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "perfect_random",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "perfect_random");
-      }
     }
 
     // =========================
@@ -437,13 +381,10 @@ class AchievementManager {
     );
 
     if (beginner && intermediate && advanced && mixed) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "difficulty_master",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "difficulty_master",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "difficulty_master");
-      }
     }
   }
 
@@ -459,13 +400,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.isNotEmpty) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "first_topic",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "first_topic",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "first_topic");
-      }
     }
 
     // =========================
@@ -473,13 +411,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.length >= 5) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "learning_momentum",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "learning_momentum",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "learning_momentum");
-      }
     }
 
     // =========================
@@ -487,11 +422,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.length >= 10) {
-      final unlocked = await AchievementService.unlockAchievement("ten_topics");
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "ten_topics");
-      }
+      await _unlockAchievement(
+        context: context,
+        achievementId: "ten_topics",
+      );
     }
 
     // =========================
@@ -499,13 +433,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.length >= 15) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "consistent_learner",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "consistent_learner",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "consistent_learner");
-      }
     }
 
     // =========================
@@ -513,13 +444,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.length >= 20) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "knowledge_builder",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "knowledge_builder",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "knowledge_builder");
-      }
     }
 
     // =========================
@@ -527,13 +455,10 @@ class AchievementManager {
     // =========================
 
     if (completedTopics.length >= 25) {
-      final unlocked = await AchievementService.unlockAchievement(
-        "topic_champion",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "topic_champion",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "topic_champion");
-      }
     }
 
     // =========================
@@ -544,11 +469,10 @@ class AchievementManager {
     //
 
     if (completedTopics.length >= 31) {
-      final unlocked = await AchievementService.unlockAchievement("all_topics");
-
-      if (unlocked) {
-        await AchievementPopupService.show(context, "all_topics");
-      }
+      await _unlockAchievement(
+        context: context,
+        achievementId: "all_topics",
+      );
     }
   }
 
@@ -565,47 +489,26 @@ class AchievementManager {
 
     // 3 Day Streak
     if (currentStreak >= 3) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "on_fire",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "on_fire",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "on_fire",
-        );
-      }
     }
 
     // 7 Day Streak
     if (currentStreak >= 7) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "learning_habit",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "learning_habit",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "learning_habit",
-        );
-      }
     }
 
     // 30 Day Streak
     if (currentStreak >= 30) {
-      final unlocked =
-      await AchievementService.unlockAchievement(
-        "unstoppable",
+      await _unlockAchievement(
+        context: context,
+        achievementId: "unstoppable",
       );
-
-      if (unlocked) {
-        await AchievementPopupService.show(
-          context,
-          "unstoppable",
-        );
-      }
     }
   }
 }

@@ -55,14 +55,14 @@ class CertificateSignature extends StatelessWidget {
           /// Signature Image
           SizedBox(
             height: 20,
-            width: 230,
+            width: 250,
             child:OverflowBox(
             maxWidth: 250,
             maxHeight: 80,
             child: Image.asset(
-              "assets/images/director_signature.png",
-              width: 220,
-              height: 70,
+              "assets/images/python_director.png",
+              width: 230,
+              height: 100,
               fit: BoxFit.contain,
             ),
           ),

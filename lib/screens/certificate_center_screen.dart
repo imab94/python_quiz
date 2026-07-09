@@ -18,9 +18,7 @@ class CertificateCenterScreen extends StatefulWidget {
       _CertificateCenterScreenState();
 }
 
-class _CertificateCenterScreenState
-    extends State<CertificateCenterScreen> {
-
+class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
   bool _isLoading = true;
 
   bool _isEligible = false;
@@ -38,19 +36,15 @@ class _CertificateCenterScreenState
   }
 
   Future<void> _loadCertificateProgress() async {
+    final eligible = await CertificateService.isEligible();
 
-    final eligible =
-    await CertificateService.isEligible();
-
-    final level =
-    await CertificateService.getCertificateLevel();
+    final level = await CertificateService.getCertificateLevel();
 
     _earnedLevel = level;
     _selectedLevel = level;
 
-    final certificate =
-    await CertificateService.generateCertificate(
-      learnerName: "John Doe",
+    final certificate = await CertificateService.generateCertificate(
+      learnerName:  "Python Learner",
     );
 
     if (!mounted) return;
@@ -64,8 +58,7 @@ class _CertificateCenterScreenState
 
   @override
   Widget build(BuildContext context) {
-    final certificate =
-    (_certificate ?? _previewFor(_selectedLevel)).copyWith(
+    final certificate = (_certificate ?? _previewFor(_selectedLevel)).copyWith(
       level: _selectedLevel,
     );
 
@@ -77,14 +70,12 @@ class _CertificateCenterScreenState
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-
                 /// =========================
                 /// Header
                 /// =========================
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       splashRadius: 22,
@@ -101,7 +92,6 @@ class _CertificateCenterScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Text(
                             "Python Certification",
                             style: GoogleFonts.lato(
@@ -146,109 +136,91 @@ class _CertificateCenterScreenState
                 /// =========================
                 Expanded(
                   child: _isLoading
-                      ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
+                      ? const Center(child: CircularProgressIndicator())
                       : SingleChildScrollView(
-                    child: Column(
-                      children: [
+                          child: Column(
+                            children: [
+                              /// Bronze / Silver / Gold
+                              CertificateRewardCard(
+                                selectedLevel: _selectedLevel,
+                                earnedLevel: _earnedLevel,
+                                onLevelChanged: (level) {
+                                  setState(() {
+                                    _selectedLevel = level;
+                                  });
+                                },
+                              ),
 
-                        /// Bronze / Silver / Gold
-                        CertificateRewardCard(
-                          selectedLevel: _selectedLevel,
-                          earnedLevel: _earnedLevel,
-                          onLevelChanged: (level) {
-                            setState(() {
-                              _selectedLevel = level;
-                            });
-                          },
-                        ),
+                              const SizedBox(height: 14),
 
-                        const SizedBox(height: 14),
-
-                        /// Certificate Preview
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxWidth: 900,
-                            ),
-                            child: ClipRRect(
-                              borderRadius:
-                              BorderRadius.circular(18),
-                              child: AnimatedScale(
-                                scale: 1,
-                                duration: const Duration(
-                                  milliseconds: 250,
-                                ),
-                                child: AspectRatio(
-                                  key: ValueKey(_selectedLevel),
-                                  aspectRatio: 1200 / 850,
-                                  child: SizedBox(
-                                    height: 320,
-                                    child: CertificateTemplate(
-                                      repaintKey:
-                                      _certificateKey,
-                                      certificate: certificate,
+                              /// Certificate Preview
+                              Center(
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 900,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: AnimatedScale(
+                                      scale: 1,
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
+                                      child: AspectRatio(
+                                        key: ValueKey(_selectedLevel),
+                                        aspectRatio: 1200 / 850,
+                                        child: SizedBox(
+                                          height: 320,
+                                          child: CertificateTemplate(
+                                            repaintKey: _certificateKey,
+                                            certificate: certificate,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
+
+                              const SizedBox(height: 16),
+
+                              /// Status + Generate
+                              CertificateGenerateCard(
+                                topicsCompleted: certificate.topicsCompleted,
+                                totalTopics: certificate.totalTopics,
+                                quizzesPassed: certificate.quizzesPassed,
+                                totalQuizzes: certificate.totalQuizzes,
+                                averageScore: certificate.averageScore,
+                                isVerified: certificate.isVerified,
+                                onGenerate: () async {
+                                  if (_certificateKey.currentContext == null) {
+                                    return;
+                                  }
+
+                                  final success =
+                                  await CertificateExportService.exportImage(
+                                    repaintKey: _certificateKey,
+                                    certificate: certificate,
+                                  );
+
+                                  if (!mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? "🎉 Certificate saved to your gallery."
+                                            : "❌ Failed to save certificate. Please try again.",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(height: 16),
+                            ],
                           ),
                         ),
-
-                        const SizedBox(height: 16),
-
-                        /// Status + Generate
-                        CertificateGenerateCard(
-                          topicsCompleted:
-                          certificate.topicsCompleted,
-                          totalTopics:
-                          certificate.totalTopics,
-                          quizzesPassed:
-                          certificate.quizzesPassed,
-                          totalQuizzes:
-                          certificate.totalQuizzes,
-                          averageScore:
-                          certificate.averageScore,
-                          isVerified:
-                          certificate.isVerified,
-                          onGenerate: () async {
-
-                            if (_certificateKey
-                                .currentContext ==
-                                null) {
-                              return;
-                            }
-
-                            final path =
-                            await CertificateExportService
-                                .exportImage(
-                              repaintKey:
-                              _certificateKey,
-                              certificate:
-                              certificate,
-                            );
-
-                            if (!mounted) return;
-
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  path == null
-                                      ? "Unable to generate certificate."
-                                      : "Certificate saved successfully.",
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -260,7 +232,7 @@ class _CertificateCenterScreenState
 
   Certificate _previewFor(CertificateLevel level) {
     return Certificate(
-      learnerName: "John Doe",
+      learnerName: _certificate?.learnerName ?? "Python Learner",
       courseName: "Python Mastery",
       level: level,
       averageScore: switch (level) {
