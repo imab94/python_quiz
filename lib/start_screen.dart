@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/screens/certificate_center_screen.dart';
 import 'package:python_quiz/screens/course_completion_screen.dart';
 import 'package:python_quiz/screens/learn_python_screen.dart';
+import 'package:python_quiz/screens/settings/feedback_screen.dart';
 import 'package:python_quiz/screens/topic_screen.dart';
 
 import 'package:python_quiz/services/achievement_service.dart';
@@ -52,6 +53,8 @@ import 'package:python_quiz/widgets/drawer/profile_drawer.dart';
 import 'package:python_quiz/models/user_profile.dart';
 import 'package:python_quiz/screens/settings_screen.dart';
 
+import 'package:python_quiz/services/app_refresh_service.dart';
+
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
 
@@ -92,6 +95,11 @@ class _StartScreenState extends State<StartScreen> {
   int _unreadNotificationCount = 0;
 
   UserProfile? _profile;
+
+
+  void _onAppRefresh() {
+    refreshDashboard();
+  }
 
   bool get _shouldShowRecommendation {
     final recommendation = recommendedTopic;
@@ -140,6 +148,17 @@ class _StartScreenState extends State<StartScreen> {
     super.initState();
     refreshDashboard();
     _loadProfile();
+    AppRefreshService.refreshNotifier.addListener(
+      _onAppRefresh,
+    );
+  }
+
+  @override
+  void dispose() {
+    AppRefreshService.refreshNotifier.removeListener(
+      _onAppRefresh,
+    );
+    super.dispose();
   }
 
   Future<void> loadProgress() async {
@@ -333,7 +352,18 @@ class _StartScreenState extends State<StartScreen> {
 
         onRateApp: () {},
 
-        onFeedback: () {},
+        onFeedback: () {
+
+          Navigator.pop(context); // Close drawer
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const FeedbackScreen(),
+            ),
+          );
+
+        },
 
         onShareApp: () {},
 
@@ -787,30 +817,7 @@ class _StartScreenState extends State<StartScreen> {
                     ),
                   ],
                 ),
-      
                 //const WhyPythonCard(),
-                const SizedBox(height: 25,),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ProfileSetupScreen(),
-                        ),
-                      );
-      
-                      debugPrint("Profile Result: $result");
-                    },
-                    icon: const Icon(Icons.person_outline),
-                    label: const Text(
-                      "🧪 Test Profile Setup",
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
               ],
             ),
           ),

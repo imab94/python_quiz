@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,12 +19,13 @@ class CertificateCenterScreen extends StatefulWidget {
       _CertificateCenterScreenState();
 }
 
-class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
+class _CertificateCenterScreenState
+    extends State<CertificateCenterScreen> {
   bool _isLoading = true;
-
   bool _isEligible = false;
 
   Certificate? _certificate;
+
   final GlobalKey _certificateKey = GlobalKey();
 
   CertificateLevel _selectedLevel = CertificateLevel.bronze;
@@ -36,30 +38,83 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
   }
 
   Future<void> _loadCertificateProgress() async {
-    final eligible = await CertificateService.isEligible();
+    try {
+      final eligible = await CertificateService.isEligible();
+      final average = await CertificateService.getAverageScore();
 
-    final level = await CertificateService.getCertificateLevel();
+      final level = average >= 95.0
+          ? CertificateLevel.gold
+          : average >= 85.0
+          ? CertificateLevel.silver
+          : average >= 70.0
+          ? CertificateLevel.bronze
+          : null;
 
-    _earnedLevel = level;
-    _selectedLevel = level;
+      final certificate = await CertificateService.generateCertificate(
+        learnerName: 'Python Learner',
+      );
 
-    final certificate = await CertificateService.generateCertificate(
-      learnerName:  "Python Learner",
-    );
+      if (!mounted) return;
 
-    if (!mounted) return;
+      setState(() {
+        _isEligible = eligible;
 
-    setState(() {
-      _isEligible = eligible;
-      _certificate = certificate;
-      _isLoading = false;
-    });
+        // Earned tier depends on score AND overall course eligibility.
+        _earnedLevel = eligible && level != null
+            ? level
+            : CertificateLevel.bronze;
+
+        // Always start on Bronze, without preventing tier selection.
+        _selectedLevel = CertificateLevel.bronze;
+
+        _certificate = certificate;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isEligible = false;
+        _earnedLevel = CertificateLevel.bronze;
+        _selectedLevel = CertificateLevel.bronze;
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to load certificate progress. Please try again.',
+          ),
+        ),
+      );
+    }
+  }
+
+  double get _requiredScore {
+    return switch (_selectedLevel) {
+      CertificateLevel.bronze => 70.0,
+      CertificateLevel.silver => 85.0,
+      CertificateLevel.gold => 95.0,
+    };
+  }
+
+  bool get _canDownloadSelectedCertificate {
+    return _isEligible &&
+        _selectedLevel.index <= _earnedLevel.index;
   }
 
   @override
   Widget build(BuildContext context) {
-    final certificate = (_certificate ?? _previewFor(_selectedLevel)).copyWith(
+    final baseCertificate =
+        _certificate ?? _previewFor(_selectedLevel);
+
+    final canDownload = _canDownloadSelectedCertificate;
+
+    final certificate = baseCertificate.copyWith(
       level: _selectedLevel,
+      isVerified: canDownload,
+      isPreview: !canDownload,
+      finalScore: canDownload ? baseCertificate.averageScore : null,
     );
 
     return Scaffold(
@@ -70,9 +125,7 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                /// =========================
-                /// Header
-                /// =========================
+                // Header
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -85,26 +138,22 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
                         size: 22,
                       ),
                     ),
-
                     const SizedBox(width: 6),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Python Certification",
+                            'Python Certification',
                             style: GoogleFonts.lato(
                               color: Colors.white,
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
                           const SizedBox(height: 4),
-
                           Text(
-                            "Become a Certified Python Developer",
+                            'Become a Certified Python Developer',
                             style: GoogleFonts.lato(
                               color: Colors.white70,
                               fontSize: 16,
@@ -113,11 +162,9 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
                         ],
                       ),
                     ),
-
                     IconButton(
                       onPressed: () {
-                        // TODO:
-                        // Show certificate information dialog
+                        // TODO: Show certificate information dialog.
                       },
                       splashRadius: 22,
                       icon: const Icon(
@@ -131,96 +178,157 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
 
                 const SizedBox(height: 18),
 
-                /// =========================
-                /// Body
-                /// =========================
+                // Body
                 Expanded(
                   child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
                       : SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              /// Bronze / Silver / Gold
-                              CertificateRewardCard(
-                                selectedLevel: _selectedLevel,
-                                earnedLevel: _earnedLevel,
-                                onLevelChanged: (level) {
-                                  setState(() {
-                                    _selectedLevel = level;
-                                  });
-                                },
-                              ),
+                    child: Column(
+                      children: [
+                        CertificateRewardCard(
+                          selectedLevel: _selectedLevel,
+                          earnedLevel: _earnedLevel,
+                          onLevelChanged: (level) {
+                            // All tiers remain selectable for preview.
+                            setState(() {
+                              _selectedLevel = level;
+                            });
+                          },
+                        ),
 
-                              const SizedBox(height: 14),
+                        const SizedBox(height: 14),
 
-                              /// Certificate Preview
-                              Center(
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 900,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: AnimatedScale(
-                                      scale: 1,
-                                      duration: const Duration(
-                                        milliseconds: 250,
-                                      ),
-                                      child: AspectRatio(
-                                        key: ValueKey(_selectedLevel),
-                                        aspectRatio: 1200 / 850,
-                                        child: SizedBox(
-                                          height: 320,
-                                          child: CertificateTemplate(
-                                            repaintKey: _certificateKey,
-                                            certificate: certificate,
-                                          ),
-                                        ),
-                                      ),
+                        // Certificate Preview
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 900,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: AnimatedScale(
+                                scale: 1,
+                                duration: const Duration(
+                                  milliseconds: 250,
+                                ),
+                                child: AspectRatio(
+                                  key: ValueKey(_selectedLevel),
+                                  aspectRatio: 1200 / 850,
+                                  child: SizedBox(
+                                    height: 320,
+                                    child: CertificateTemplate(
+                                      repaintKey: _certificateKey,
+                                      certificate: certificate,
                                     ),
                                   ),
                                 ),
                               ),
-
-                              const SizedBox(height: 16),
-
-                              /// Status + Generate
-                              CertificateGenerateCard(
-                                topicsCompleted: certificate.topicsCompleted,
-                                totalTopics: certificate.totalTopics,
-                                quizzesPassed: certificate.quizzesPassed,
-                                totalQuizzes: certificate.totalQuizzes,
-                                averageScore: certificate.averageScore,
-                                isVerified: certificate.isVerified,
-                                onGenerate: () async {
-                                  if (_certificateKey.currentContext == null) {
-                                    return;
-                                  }
-
-                                  final success =
-                                  await CertificateExportService.exportImage(
-                                    repaintKey: _certificateKey,
-                                    certificate: certificate,
-                                  );
-
-                                  if (!mounted) return;
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        success
-                                            ? "🎉 Certificate saved to your gallery."
-                                            : "❌ Failed to save certificate. Please try again.",
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-
-                              const SizedBox(height: 16),
-                            ],
+                            ),
                           ),
                         ),
+
+                        const SizedBox(height: 16),
+
+                        // Status + Generate
+                        CertificateGenerateCard(
+                          topicsCompleted:
+                          certificate.topicsCompleted,
+                          totalTopics: certificate.totalTopics,
+                          quizzesPassed: certificate.quizzesPassed,
+                          totalQuizzes: certificate.totalQuizzes,
+                          averageScore: certificate.averageScore,
+                          isVerified: canDownload,
+                          requiredScore: _requiredScore,
+                          onGenerate: () async {
+                            // Recheck requirements immediately before export.
+                            try {
+                              final eligible =
+                              await CertificateService.isEligible();
+
+                              final currentScore =
+                              await CertificateService
+                                  .getAverageScore();
+
+                              if (!mounted) return;
+
+                              final currentEarnedLevel = currentScore >= 95.0
+                                  ? CertificateLevel.gold
+                                  : currentScore >= 85.0
+                                  ? CertificateLevel.silver
+                                  : currentScore >= 70.0
+                                  ? CertificateLevel.bronze
+                                  : null;
+
+                              final canDownloadNow = eligible &&
+                                  currentEarnedLevel != null &&
+                                  _selectedLevel.index <= currentEarnedLevel.index &&
+                                  currentScore >= _requiredScore &&
+                                  currentScore <= 100.0;
+
+                              if (!canDownloadNow) {
+                                await _loadCertificateProgress();
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Complete all topics, pass all quizzes, '
+                                          'and score at least '
+                                          '${_requiredScore.toStringAsFixed(0)}% '
+                                          'to download this certificate.',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (_certificateKey.currentContext ==
+                                  null) {
+                                return;
+                              }
+
+                              final success =
+                              await CertificateExportService
+                                  .exportImage(
+                                repaintKey: _certificateKey,
+                                certificate: certificate,
+                              );
+
+                              if (!mounted) return;
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    success
+                                        ? '🎉 Certificate saved to your gallery.'
+                                        : '❌ Failed to save certificate. Please try again.',
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Unable to generate certificate. Please try again.',
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -232,35 +340,23 @@ class _CertificateCenterScreenState extends State<CertificateCenterScreen> {
 
   Certificate _previewFor(CertificateLevel level) {
     return Certificate(
-      learnerName: _certificate?.learnerName ?? "Python Learner",
-      courseName: "Python Mastery",
+      learnerName: 'Python Learner',
+      courseName: 'Python Mastery',
       level: level,
-      averageScore: switch (level) {
-        CertificateLevel.bronze => 78,
-        CertificateLevel.silver => 90,
-        CertificateLevel.gold => 98,
-      },
-      quizzesPassed: switch (level) {
-        CertificateLevel.bronze => 32,
-        CertificateLevel.silver => 46,
-        CertificateLevel.gold => 60,
-      },
-      totalQuizzes: 60,
-      topicsCompleted: switch (level) {
-        CertificateLevel.bronze => 18,
-        CertificateLevel.silver => 24,
-        CertificateLevel.gold => 30,
-      },
-      totalTopics: 30,
+      averageScore: 0,
+      quizzesPassed: 0,
+      totalQuizzes: CertificateService.totalTopics,
+      topicsCompleted: 0,
+      totalTopics: CertificateService.totalTopics,
       issuedDate: DateTime.now(),
-      certificateId: "PENDING",
-      organizationName: "PYTHON LEARNING PLATFORM",
-      directorName: "Python Learning Platform",
-      directorTitle: "Course Director",
-      verificationUrl: "",
+      certificateId: 'PENDING',
+      organizationName: 'PYTHON LEARNING PLATFORM',
+      directorName: 'Python Learning Platform',
+      directorTitle: 'Course Director',
+      verificationUrl: '',
       finalScore: null,
-      isVerified: _isEligible && level == _earnedLevel,
-      isPreview: !_isEligible || level != _earnedLevel,
+      isVerified: false,
+      isPreview: true,
     );
   }
 }

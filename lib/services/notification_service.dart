@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:python_quiz/models/app_notification.dart';
 
 class NotificationService {

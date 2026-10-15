@@ -46,4 +46,12 @@ class CompletedService {
 
     return completed.length / totalTopics;
   }
+
+
+  // Reset
+  static Future<void> reset() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove(_key);
+  }
 }

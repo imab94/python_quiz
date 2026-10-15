@@ -4,6 +4,7 @@ import 'package:python_quiz/screens/reminder_preferences_screen.dart';
 import 'package:python_quiz/widgets/settings/settings_tile.dart';
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/screens/learner_profile_screen.dart';
+import 'package:python_quiz/widgets/dialogs/reset_learning_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -101,7 +102,13 @@ class SettingsScreen extends StatelessWidget {
                       icon: Icons.delete_outline_rounded,
                       title: "Reset Learning Progress",
                       subtitle: "Clear all progress and start again",
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const ResetLearningDialog(),
+                        );
+                      },
                     ),
                   ],
                 ),

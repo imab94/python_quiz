@@ -10,22 +10,40 @@ class CertificateGenerateCard extends StatelessWidget {
     required this.averageScore,
     required this.isVerified,
     required this.onGenerate,
+    required this.requiredScore,
   });
 
   final int topicsCompleted;
   final int totalTopics;
-
   final int quizzesPassed;
   final int totalQuizzes;
-
   final double averageScore;
-
   final bool isVerified;
-
   final VoidCallback onGenerate;
+
+  /// Bronze = 70%, Silver = 85%, Gold = 95%.
+  final double requiredScore;
 
   @override
   Widget build(BuildContext context) {
+    // Prevent division by zero.
+    final safeTotalTopics = totalTopics > 0 ? totalTopics : 1;
+    final safeTotalQuizzes = totalQuizzes > 0 ? totalQuizzes : 1;
+
+    // Keep progress values within 0.0–1.0.
+    final safeScore = averageScore.clamp(0.0, 100.0);
+    final safeRequiredScore = requiredScore.clamp(1.0, 100.0);
+
+    final topicsProgress =
+    (topicsCompleted / safeTotalTopics).clamp(0.0, 1.0);
+
+    final quizzesProgress =
+    (quizzesPassed / safeTotalQuizzes).clamp(0.0, 1.0);
+
+    // Dynamic progress towards the selected certificate threshold.
+    final scoreProgress =
+    (safeScore / safeRequiredScore).clamp(0.0, 1.0);
+
     return Card(
       elevation: 3,
       color: const Color(0xff381f80),
@@ -41,7 +59,6 @@ class CertificateGenerateCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               "Certificate Status",
               style: TextStyle(
@@ -55,18 +72,16 @@ class CertificateGenerateCard extends StatelessWidget {
 
             Row(
               children: [
-
                 Container(
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: const Color(0xffF6B534).withValues(alpha: .18),
+                    color: const Color(0xffF6B534)
+                        .withValues(alpha: .18),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
-                    isVerified
-                        ? Icons.verified
-                        : Icons.lock,
+                    isVerified ? Icons.verified : Icons.lock,
                     color: isVerified
                         ? Colors.greenAccent
                         : const Color(0xffF6B534),
@@ -78,14 +93,10 @@ class CertificateGenerateCard extends StatelessWidget {
 
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Text(
-                        isVerified
-                            ? "Certificate Ready"
-                            : "Locked",
+                        isVerified ? "Certificate Ready" : "Locked",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -108,7 +119,7 @@ class CertificateGenerateCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
 
@@ -123,9 +134,8 @@ class CertificateGenerateCard extends StatelessWidget {
             _ProgressTile(
               icon: Icons.menu_book_rounded,
               title: "Topics Completed",
-              value: topicsCompleted / totalTopics,
-              trailing:
-              "$topicsCompleted / $totalTopics",
+              value: topicsProgress,
+              trailing: "$topicsCompleted / $totalTopics",
               color: Colors.green,
             ),
 
@@ -134,9 +144,8 @@ class CertificateGenerateCard extends StatelessWidget {
             _ProgressTile(
               icon: Icons.quiz_rounded,
               title: "Quizzes Passed",
-              value: quizzesPassed / totalQuizzes,
-              trailing:
-              "$quizzesPassed / $totalQuizzes",
+              value: quizzesProgress,
+              trailing: "$quizzesPassed / $totalQuizzes",
               color: Colors.blue,
             ),
 
@@ -145,9 +154,10 @@ class CertificateGenerateCard extends StatelessWidget {
             _ProgressTile(
               icon: Icons.workspace_premium_rounded,
               title: "Minimum Score",
-              value: averageScore / 70,
+              value: scoreProgress,
               trailing:
-              "${averageScore.toStringAsFixed(1)} / 70%",
+              "${safeScore.toStringAsFixed(1)}% / "
+                  "${safeRequiredScore.toStringAsFixed(0)}%",
               color: Colors.orange,
             ),
 
@@ -163,10 +173,8 @@ class CertificateGenerateCard extends StatelessWidget {
                 ),
               ),
               child: Row(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   const Icon(
                     Icons.info_outline,
                     color: Color(0xffF6B534),
@@ -178,7 +186,9 @@ class CertificateGenerateCard extends StatelessWidget {
                     child: Text(
                       isVerified
                           ? "Your certificate is now officially verified and ready to download."
-                          : "Earn at least 70% overall score and complete all topics & quizzes.",
+                          : "Earn at least "
+                          "${safeRequiredScore.toStringAsFixed(0)}% overall "
+                          "score and complete all topics & quizzes.",
                       style: const TextStyle(
                         color: Colors.white60,
                         height: 1.4,
@@ -200,7 +210,9 @@ class CertificateGenerateCard extends StatelessWidget {
                   foregroundColor: Colors.white,
                   disabledForegroundColor: Colors.white70,
                   backgroundColor: const Color(0xFF6B46FF),
-                  disabledBackgroundColor: const Color(0xFF6B46FF).withValues(alpha: .35),
+                  disabledBackgroundColor:
+                  const Color(0xFF6B46FF)
+                      .withValues(alpha: .35),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -213,12 +225,16 @@ class CertificateGenerateCard extends StatelessWidget {
                   isVerified
                       ? Icons.download_rounded
                       : Icons.lock_outline_rounded,
-                  color: Colors.white54,
+                  color: isVerified
+                      ? Colors.white
+                      : Colors.white54,
                 ),
-                label: const Text(
+                label: Text(
                   "Generate Certificate",
                   style: TextStyle(
-                    color: Colors.white54,
+                    color: isVerified
+                        ? Colors.white
+                        : Colors.white54,
                   ),
                 ),
               ),
@@ -231,11 +247,11 @@ class CertificateGenerateCard extends StatelessWidget {
                 isVerified
                     ? "Your certificate is ready."
                     : "Available once all requirements are completed.",
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white54,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -264,7 +280,6 @@ class _ProgressTile extends StatelessWidget {
 
     return Row(
       children: [
-
         Container(
           width: 42,
           height: 42,
@@ -281,17 +296,36 @@ class _ProgressTile extends StatelessWidget {
 
         const SizedBox(width: 16),
 
+        // Same Expanded width and original progress bar dimensions.
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Title and dynamic percentage/count above the bar.
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
 
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+                  const SizedBox(width: 6),
+
+                  Text(
+                    trailing,
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 8),
@@ -302,20 +336,10 @@ class _ProgressTile extends StatelessWidget {
                   value: progress,
                   minHeight: 8,
                   backgroundColor: Colors.white10,
-                  valueColor: AlwaysStoppedAnimation(color),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
               ),
             ],
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        Text(
-          trailing,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
           ),
         ),
       ],

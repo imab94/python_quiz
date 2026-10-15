@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/widgets/certificate/certificate_level_card.dart';
 
@@ -20,12 +19,11 @@ class CertificateRewardCard extends StatelessWidget {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.12),
+        color: Colors.white.withValues(alpha: .12),
         borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
@@ -38,9 +36,7 @@ class CertificateRewardCard extends StatelessWidget {
               onTap: () => onLevelChanged(CertificateLevel.bronze),
             ),
           ),
-
           const SizedBox(width: 6),
-
           Expanded(
             child: CertificateLevelCard(
               level: CertificateLevel.silver,
@@ -49,9 +45,7 @@ class CertificateRewardCard extends StatelessWidget {
               onTap: () => onLevelChanged(CertificateLevel.silver),
             ),
           ),
-
           const SizedBox(width: 6),
-
           Expanded(
             child: CertificateLevelCard(
               level: CertificateLevel.gold,

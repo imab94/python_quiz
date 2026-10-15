@@ -1,6 +1,4 @@
-import 'dart:math';
 
-import 'package:intl/intl.dart';
 import 'package:python_quiz/data/topics.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/services/completed_service.dart';
@@ -8,102 +6,98 @@ import 'package:python_quiz/services/quiz_progress_service.dart';
 import 'package:python_quiz/services/profile_service.dart';
 
 class CertificateService {
-
-  /// Total learning topics
   static int get totalTopics => allTopics.length;
 
-  /// Has the learner earned the certificate?
+  /// Required score for the first certificate tier.
+  static const double minimumScore = 70.0;
+
+  /// True only when all course requirements are satisfied.
   static Future<bool> isEligible() async {
+    final completedTopics = await CompletedService.getCompletedTopics();
 
-    final completedTopics =
-    await CompletedService.getCompletedTopics();
-
-    if (completedTopics.length != totalTopics) {
+    if (completedTopics.length < totalTopics) {
       return false;
     }
 
-    final quizzesPassed =
-    await QuizProgressService.areAllQuizzesPassed(
-      totalTopics,
-    );
+    final allQuizzesPassed =
+    await QuizProgressService.areAllQuizzesPassed(totalTopics);
 
-    if (!quizzesPassed) {
+    if (!allQuizzesPassed) {
       return false;
     }
 
-    final average =
-    await QuizProgressService.getAveragePercentage();
+    final average = await getAverageScore();
 
-    if (average < 70) {
-      return false;
-    }
-
-    return true;
+    return average >= minimumScore && average <= 100.0;
   }
 
+  /// Returns the score-based tier.
+  ///
+  /// Note: This method calculates the tier from the score.
+  /// Call isEligible() separately before issuing a certificate.
   static Future<CertificateLevel> getCertificateLevel() async {
+    final average = await getAverageScore();
 
-    final average =
-    await QuizProgressService.getAveragePercentage();
-
-    if (average >= 95) {
+    if (average >= 95.0) {
       return CertificateLevel.gold;
     }
 
-    if (average >= 85) {
+    if (average >= 85.0) {
       return CertificateLevel.silver;
     }
 
     return CertificateLevel.bronze;
   }
 
-
   static Future<double> getAverageScore() async {
     return QuizProgressService.getAveragePercentage();
   }
 
-
+  /// Stable ID for the learner across Bronze, Silver and Gold.
+  ///
+  /// Uses the saved profile ID instead of generating a new random ID
+  /// whenever a certificate is opened or exported.
   static Future<String> generateCertificateId() async {
-    final level = await getCertificateLevel();
+    final profile = await ProfileService.getProfile();
 
-    final levelCode = switch (level) {
-      CertificateLevel.gold => "G",
-      CertificateLevel.silver => "S",
-      CertificateLevel.bronze => "B",
-    };
+    final profileId = profile?.profileId.trim();
 
-    final date = DateFormat('yyyyMMdd').format(DateTime.now());
+    if (profileId == null || profileId.isEmpty) {
+      throw StateError(
+        'A saved learner profile is required to generate a certificate ID.',
+      );
+    }
 
-    final random = Random.secure();
-    final number = (100000 + random.nextInt(900000)).toString();
-
-    return "PY-$levelCode-$date-$number";
+    return 'PY-$profileId';
   }
 
+  /// Builds the certificate using the saved learner profile.
+  ///
+  /// Ineligible learners receive a watermarked preview.
   static Future<Certificate> generateCertificate({
     required String learnerName,
   }) async {
-
-    final eligible = await isEligible();
-
-    final completedTopics =
-    await CompletedService.getCompletedTopics();
-
-    final quizzesPassed =
-    await QuizProgressService.getPassedQuizCount();
-
-    final average =
-    await getAverageScore();
-
-    final level =
-    await getCertificateLevel();
-    final certificateId = await generateCertificateId();
-
     final profile = await ProfileService.getProfile();
 
+    final eligible = await isEligible();
+    final average = await getAverageScore();
+
+    final completedTopics = await CompletedService.getCompletedTopics();
+    final quizzesPassed = await QuizProgressService.getPassedQuizCount();
+
+    final level = await getCertificateLevel();
+
+    // Do not create a certificate ID if no saved profile exists.
+    // This keeps the ID tied to the learner's persistent profile.
+    final certificateId = await generateCertificateId();
+
+    final learnerDisplayName = profile?.name.trim().isNotEmpty == true
+        ? profile!.name
+        : learnerName;
+
     return Certificate(
-      learnerName: profile?.name ?? learnerName,
-      courseName: "Python Learning Path",
+      learnerName: learnerDisplayName,
+      courseName: 'Python Learning Path',
       level: level,
       topicsCompleted: completedTopics.length,
       totalTopics: totalTopics,
@@ -114,13 +108,12 @@ class CertificateService {
       issuedDate: DateTime.now(),
       certificateId: certificateId,
       verificationUrl:
-      "https://pythonlearningplatform.com/verify/$certificateId",
-      directorName: "Python Learning Platform",
-      directorTitle: "Certification Authority",
+      'https://pythonlearningplatform.com/verify/$certificateId',
+      directorName: 'Python Learning Platform',
+      directorTitle: 'Certification Authority',
       isVerified: eligible,
       isPreview: !eligible,
-      organizationName: "Python Master"
+      organizationName: 'Python Master',
     );
   }
-
 }

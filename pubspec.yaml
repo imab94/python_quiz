@@ -47,6 +47,7 @@ dependencies:
   uuid: ^4.5.1
   image_picker: ^1.2.0
   country_picker: ^2.0.27
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -86,7 +87,6 @@ flutter:
   assets:
     - assets/images/img_1.png
     - assets/images/python-logo.png
-    - assets/images/director_signature.png
     - assets/images/python_director.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
