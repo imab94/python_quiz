@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:python_quiz/widgets/app_background.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/services/certificate_service.dart';
@@ -89,6 +88,33 @@ class _CertificateCenterScreenState
       );
     }
   }
+
+
+
+  Future<String?> _showExportFormatDialog() async {
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Download Certificate'),
+          content: const Text('Choose your preferred format.'),
+          actions: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.pop(dialogContext, 'png'),
+              child: const Text('PNG Image'),
+            ),
+            ElevatedButton(
+              onPressed: () =>
+                  Navigator.pop(dialogContext, 'pdf'),
+              child: const Text('PDF Document'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   double get _requiredScore {
     return switch (_selectedLevel) {
@@ -241,15 +267,12 @@ class _CertificateCenterScreenState
                           averageScore: certificate.averageScore,
                           isVerified: canDownload,
                           requiredScore: _requiredScore,
+
                           onGenerate: () async {
                             // Recheck requirements immediately before export.
                             try {
-                              final eligible =
-                              await CertificateService.isEligible();
-
-                              final currentScore =
-                              await CertificateService
-                                  .getAverageScore();
+                              final eligible = await CertificateService.isEligible();
+                              final currentScore = await CertificateService.getAverageScore();
 
                               if (!mounted) return;
 
@@ -272,12 +295,10 @@ class _CertificateCenterScreenState
 
                                 if (!mounted) return;
 
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Complete all topics, pass all quizzes, '
-                                          'and score at least '
+                                      'Complete all topics, pass all quizzes, and score at least '
                                           '${_requiredScore.toStringAsFixed(0)}% '
                                           'to download this certificate.',
                                     ),
@@ -286,35 +307,62 @@ class _CertificateCenterScreenState
                                 return;
                               }
 
-                              if (_certificateKey.currentContext ==
-                                  null) {
+                              if (_certificateKey.currentContext == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Certificate preview is not ready. Please try again.'),
+                                  ),
+                                );
                                 return;
                               }
 
-                              final success =
-                              await CertificateExportService
-                                  .exportImage(
-                                repaintKey: _certificateKey,
-                                certificate: certificate,
-                              );
+                              // Ask the user to choose the export format.
+                              final format = await _showExportFormatDialog();
 
-                              if (!mounted) return;
+                              if (!mounted || format == null) return;
 
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    success
-                                        ? '🎉 Certificate saved to your gallery.'
-                                        : '❌ Failed to save certificate. Please try again.',
+                              if (format != 'png' && format != 'pdf') return;
+
+                              if (format == 'png') {
+                                final success = await CertificateExportService.exportImage(
+                                  repaintKey: _certificateKey,
+                                  certificate: certificate,
+                                );
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      success
+                                          ? '🎉 Certificate saved to your gallery.'
+                                          : '❌ Failed to save certificate. Please try again.',
+                                    ),
                                   ),
-                                ),
-                              );
-                            } catch (e) {
+                                );
+                              } else {
+                                // exportPdf() creates the PDF and opens the print/share layout.
+                                await CertificateExportService.exportPdf(
+                                  repaintKey: _certificateKey,
+                                  certificate: certificate,
+                                );
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      '🎉 PDF export opened. Save or share your certificate from the dialog.',
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e, stackTrace) {
+                              debugPrintStack(stackTrace: stackTrace);
+
                               if (!mounted) return;
 
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
                                     'Unable to generate certificate. Please try again.',
@@ -323,6 +371,7 @@ class _CertificateCenterScreenState
                               );
                             }
                           },
+
                         ),
 
                         const SizedBox(height: 16),

@@ -1,4 +1,3 @@
-
 import 'package:python_quiz/data/topics.dart';
 import 'package:python_quiz/models/certificate.dart';
 import 'package:python_quiz/services/completed_service.dart';
@@ -31,9 +30,7 @@ class CertificateService {
     return average >= minimumScore && average <= 100.0;
   }
 
-  /// Returns the score-based tier.
-  ///
-  /// Note: This method calculates the tier from the score.
+
   /// Call isEligible() separately before issuing a certificate.
   static Future<CertificateLevel> getCertificateLevel() async {
     final average = await getAverageScore();
@@ -53,13 +50,9 @@ class CertificateService {
     return QuizProgressService.getAveragePercentage();
   }
 
-  /// Stable ID for the learner across Bronze, Silver and Gold.
-  ///
-  /// Uses the saved profile ID instead of generating a new random ID
-  /// whenever a certificate is opened or exported.
+
   static Future<String> generateCertificateId() async {
     final profile = await ProfileService.getProfile();
-
     final profileId = profile?.profileId.trim();
 
     if (profileId == null || profileId.isEmpty) {
@@ -68,12 +61,12 @@ class CertificateService {
       );
     }
 
-    return 'PY-$profileId';
+    final certificateId = 'PY-$profileId';
+
+    return certificateId;
   }
 
-  /// Builds the certificate using the saved learner profile.
-  ///
-  /// Ineligible learners receive a watermarked preview.
+
   static Future<Certificate> generateCertificate({
     required String learnerName,
   }) async {

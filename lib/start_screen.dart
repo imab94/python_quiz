@@ -55,6 +55,8 @@ import 'package:python_quiz/screens/settings_screen.dart';
 
 import 'package:python_quiz/services/app_refresh_service.dart';
 
+import 'screens/python_playground_screen.dart';
+
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
 
@@ -368,6 +370,17 @@ class _StartScreenState extends State<StartScreen> {
         onShareApp: () {},
 
         onAbout: () {},
+
+        onPythonPlayground: () {
+          Navigator.pop(context); // Close drawer
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const PythonPlaygroundScreen(),
+            ),
+          );
+        },
       ),
       backgroundColor: Colors.transparent,
       body: SafeArea(

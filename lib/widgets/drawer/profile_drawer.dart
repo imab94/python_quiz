@@ -14,6 +14,7 @@ class ProfileDrawer extends StatelessWidget {
     required this.onRateApp,
     required this.onFeedback,
     required this.onAbout,
+    required this.onPythonPlayground,
   });
 
   final UserProfile? profile;
@@ -23,22 +24,20 @@ class ProfileDrawer extends StatelessWidget {
   final VoidCallback onFeedback;
   final VoidCallback onShareApp;
   final VoidCallback onAbout;
+  final VoidCallback onPythonPlayground;
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       width: MediaQuery.of(context).size.width * .82,
-      backgroundColor: Color(0xFF3D0E9E),
+      backgroundColor: const Color(0xFF3D0E9E),
       elevation: 0,
       child: SafeArea(
         child: Column(
           children: [
-
             const SizedBox(height: 24),
 
-            DrawerHeaderCard(
-              profile: profile,
-            ),
+            DrawerHeaderCard(profile: profile),
 
             const SizedBox(height: 24),
 
@@ -64,8 +63,15 @@ class ProfileDrawer extends StatelessWidget {
               onTap: onSettings,
             ),
 
+            // Python Playground
             DrawerItem(
-              icon: Icons.settings_rounded,
+              icon: Icons.code_rounded,
+              title: "Python Compiler",
+              onTap: onPythonPlayground,
+            ),
+
+            DrawerItem(
+              icon: Icons.star_rounded,
               title: "Rate App",
               onTap: onRateApp,
             ),
@@ -88,9 +94,7 @@ class ProfileDrawer extends StatelessWidget {
               onTap: onAbout,
             ),
 
-            const Expanded(
-              child: SizedBox(),
-            ),
+            const Expanded(child: SizedBox()),
 
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
